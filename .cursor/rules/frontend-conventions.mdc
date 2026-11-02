@@ -1,0 +1,112 @@
+---
+description: Jodiyaan frontend coding conventions — constants, types, routes, API client, helpers, hooks, Tailwind, and imports
+alwaysApply: true
+---
+
+# Jodiyaan Frontend Conventions
+
+Follow these rules whenever writing or editing frontend code in this repository.
+
+## 1. No constants in components
+
+Never declare static arrays, option maps, config objects, magic numbers/strings, or route paths inside component/page files.
+
+- Place static data and configurations in `src/lib/` or dedicated constants modules.
+- Import constants at the top of the file.
+
+```tsx
+// ❌ BAD — inside ProfileForm.tsx
+const RELIGIONS = ['Hindu', 'Muslim', 'Sikh', 'Christian'];
+const GENDERS = [{ label: 'Male', value: 'male' }];
+
+// ✅ GOOD
+import { RELIGION_OPTIONS, GENDER_OPTIONS } from '@/lib/constants';
+```
+
+## 2. No types or interfaces in components
+
+Never define domain entity types, API response types, or heavy interfaces directly inside component or page files.
+
+- Place types in `src/lib/types.ts`.
+- Component-specific props types should be placed in `src/lib/types.ts` or imported from it when shared.
+
+```tsx
+// ❌ BAD — inside DiscoverPage.tsx
+type ProfileCard = { id: string; fullName: string; age: number; city: string };
+
+// ✅ GOOD
+import type { ProfileCard } from '@/lib/types';
+```
+
+## 3. Prefer helpers for reusable logic
+
+Extract formatting, calculations, and pure transformations into `src/lib/` instead of duplicating logic inline.
+
+- Formatting: `src/lib/format.ts` (e.g. `formatAge`, `formatLocation`, `formatDate`, `formatHeight`).
+- Session: `src/lib/session.ts` (e.g. `getToken`, `setToken`, `clearSession`).
+
+```tsx
+// ❌ BAD
+const heightStr = `${Math.floor(heightCm / 30.48)}'${Math.round((heightCm % 30.48) / 2.54)}"`;
+
+// ✅ GOOD
+import { formatHeight } from '@/lib/format';
+const heightStr = formatHeight(heightCm);
+```
+
+## 4. Data logic in hooks and API client
+
+Components should remain presentational and focused on rendering and user interaction.
+
+- All network requests must use `src/lib/api.ts` (`api.profiles.*`, `api.matches.*`, etc.).
+- Handle loading, error state, and async operations using `src/lib/use-api.ts` or dedicated custom hooks.
+- Handle `ApiError` to show human-readable messages to the user.
+
+```tsx
+// ❌ BAD — raw fetch inside JSX onClick
+const res = await fetch('/api/profiles/me');
+
+// ✅ GOOD
+import { api, ApiError } from '@/lib/api';
+try {
+  const profile = await api.profiles.getOwn();
+} catch (err) {
+  if (err instanceof ApiError) setError(err.message);
+}
+```
+
+## 5. Route Protection and Guards
+
+- Pages in `src/app/(app)/` require authentication. Wrap the layout or page with `<AuthGuard>`.
+- Auth entry pages like `src/app/login/` should redirect logged-in users with `<RedirectIfSignedIn>`.
+- Never scatter ad-hoc redirect checks across random child components.
+
+## 6. No inline / mid-file imports
+
+- All `import` statements must be placed strictly at the top of the file.
+- Grouping order:
+  1. External packages (`react`, `next/*`, `lucide-react`)
+  2. Internal library utilities (`@/lib/*` or `../lib/*`)
+  3. Components (`@/components/*` or `../components/*`)
+  4. Styles (if any)
+
+## 7. Tailwind CSS v4 conventions
+
+- Use semantic Tailwind utility classes rather than arbitrary styles.
+- Maintain responsive, mobile-first layouts (`flex`, `grid`, `sm:`, `md:`, `lg:`).
+- Global theme definitions and color tokens are maintained in `src/app/globals.css`.
+
+## Folder Layout
+
+```
+src/
+  app/
+    (app)/        # Protected pages (discover, interests, matches, me, profiles)
+    login/        # Login & OTP authentication
+    onboarding/   # First-time profile creation
+    globals.css   # Global styles and Tailwind configuration
+    layout.tsx    # Root layout with AuthProvider
+  components/     # Reusable UI, shell, and guard components
+  lib/            # API client, session, types, formatting, and utilities
+public/           # Static assets
+```
