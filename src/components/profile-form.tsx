@@ -1,67 +1,37 @@
 "use client";
 
+import { ArrowRight } from "lucide-react";
 import { useState } from "react";
+import { Button, Field, Input, Notice, Select, Textarea } from "@/components/ui";
 import { ApiError } from "@/lib/api";
+import {
+  COMMUNITIES_LIST,
+  EDUCATION_LIST,
+  HEIGHTS_CM,
+  PROFILE_TEXT_FIELDS,
+  RELIGIONS_LIST,
+} from "@/lib/constants";
 import {
   formatHeight,
   MANAGED_BY_LABELS,
   MARITAL_STATUS_LABELS,
 } from "@/lib/format";
 import type {
-  Gender,
-  ManagedBy,
-  MaritalStatus,
   OwnProfile,
+  ProfileFormProps,
+  ProfileFormState,
   ProfileInput,
 } from "@/lib/types";
-import { Button, Field, Input, Notice, Select, Textarea } from "./ui";
 
-const HEIGHTS_CM = Array.from({ length: 31 }, (_, i) =>
-  Math.round((54 + i) * 2.54),
-);
-const RELIGIONS = [
-  "Hindu",
-  "Muslim",
-  "Sikh",
-  "Christian",
-  "Jain",
-  "Buddhist",
-  "Parsi",
-  "Jewish",
-  "No religion",
-  "Other",
-];
-const TEXT_FIELDS = [
-  "fullName",
-  "religion",
-  "community",
-  "motherTongue",
-  "city",
-  "state",
-  "education",
-  "profession",
-  "about",
-] as const;
-
-type FormState = Record<(typeof TEXT_FIELDS)[number], string> & {
-  gender: Gender | "";
-  dateOfBirth: string;
-  maritalStatus: MaritalStatus;
-  managedBy: ManagedBy;
-  heightCm: string;
-  partnerAgeMin: string;
-  partnerAgeMax: string;
-};
-
-function initialState(profile?: OwnProfile): FormState {
+function initialState(profile?: OwnProfile): ProfileFormState {
   return {
     fullName: profile?.fullName ?? "",
-    gender: profile?.gender ?? "",
+    gender: profile?.gender ?? "female",
     dateOfBirth: profile?.dateOfBirth ?? "",
     maritalStatus: profile?.maritalStatus ?? "never_married",
     managedBy: profile?.managedBy ?? "self",
     heightCm: profile?.heightCm ? String(profile.heightCm) : "",
-    religion: profile?.religion ?? "",
+    religion: profile?.religion ?? "Hindu",
     community: profile?.community ?? "",
     motherTongue: profile?.motherTongue ?? "",
     city: profile?.city ?? "",
@@ -74,16 +44,15 @@ function initialState(profile?: OwnProfile): FormState {
   };
 }
 
-function toInput(state: FormState, isCreate: boolean): ProfileInput {
+function toInput(state: ProfileFormState, isCreate: boolean): ProfileInput {
   const input: Record<string, unknown> = {
     gender: state.gender,
     dateOfBirth: state.dateOfBirth,
     maritalStatus: state.maritalStatus,
     managedBy: state.managedBy,
   };
-  for (const field of TEXT_FIELDS) {
+  for (const field of PROFILE_TEXT_FIELDS) {
     const value = state[field].trim();
-    // On edit, an empty string clears the field; on create it is simply left out.
     if (value || !isCreate) input[field] = value;
   }
   for (const field of ["heightCm", "partnerAgeMin", "partnerAgeMax"] as const) {
@@ -96,18 +65,16 @@ export function ProfileForm({
   profile,
   submitLabel,
   onSubmit,
-}: {
-  profile?: OwnProfile;
-  submitLabel: string;
-  onSubmit: (input: ProfileInput) => Promise<void>;
-}) {
+}: ProfileFormProps) {
   const isCreate = !profile;
-  const [state, setState] = useState<FormState>(() => initialState(profile));
+  const [state, setState] = useState<ProfileFormState>(() =>
+    initialState(profile),
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const set =
-    <K extends keyof FormState>(key: K) =>
+    <K extends keyof ProfileFormState>(key: K) =>
     (
       event: React.ChangeEvent<
         HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
@@ -115,7 +82,7 @@ export function ProfileForm({
     ) =>
       setState((current) => ({
         ...current,
-        [key]: event.target.value as FormState[K],
+        [key]: event.target.value as ProfileFormState[K],
       }));
 
   async function handleSubmit(event: React.FormEvent) {
@@ -132,60 +99,83 @@ export function ProfileForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      <Section title="Basics">
+      {/* Looking for / Gender choice */}
+      <div>
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+          I am registering a
+        </p>
+        <div className="grid grid-cols-2 gap-3">
+          <button
+            type="button"
+            disabled={!isCreate}
+            onClick={() => setState((s) => ({ ...s, gender: "female" }))}
+            className={`min-h-11 rounded-lg font-semibold transition-all text-sm border ${
+              state.gender === "female"
+                ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                : "bg-background text-foreground border-border hover:bg-secondary/40"
+            }`}
+          >
+            Bride (Woman)
+          </button>
+          <button
+            type="button"
+            disabled={!isCreate}
+            onClick={() => setState((s) => ({ ...s, gender: "male" }))}
+            className={`min-h-11 rounded-lg font-semibold transition-all text-sm border ${
+              state.gender === "male"
+                ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                : "bg-background text-foreground border-border hover:bg-secondary/40"
+            }`}
+          >
+            Groom (Man)
+          </button>
+        </div>
+      </div>
+
+      {/* Basic Essentials */}
+      <div className="grid md:grid-cols-2 gap-4">
         <Field label="Full name">
           <Input
             required
             minLength={2}
             maxLength={80}
+            placeholder="First and last name"
             value={state.fullName}
             onChange={set("fullName")}
           />
         </Field>
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="I am">
-            <Select
-              required
-              value={state.gender}
-              onChange={set("gender")}
-              disabled={!isCreate}
-            >
-              <option value="" disabled>
-                Select
+
+        <Field label="Date of birth">
+          <Input
+            type="date"
+            required
+            value={state.dateOfBirth}
+            onChange={set("dateOfBirth")}
+          />
+        </Field>
+
+        <Field label="Marital status">
+          <Select value={state.maritalStatus} onChange={set("maritalStatus")}>
+            {Object.entries(MARITAL_STATUS_LABELS).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
               </option>
-              <option value="female">A woman (bride)</option>
-              <option value="male">A man (groom)</option>
-            </Select>
-          </Field>
-          <Field label="Date of birth">
-            <Input
-              type="date"
-              required
-              value={state.dateOfBirth}
-              onChange={set("dateOfBirth")}
-            />
-          </Field>
-          <Field label="Marital status">
-            <Select value={state.maritalStatus} onChange={set("maritalStatus")}>
-              {Object.entries(MARITAL_STATUS_LABELS).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </Select>
-          </Field>
-          <Field label="Height">
-            <Select value={state.heightCm} onChange={set("heightCm")}>
-              <option value="">Prefer not to say</option>
-              {HEIGHTS_CM.map((cm) => (
-                <option key={cm} value={cm}>
-                  {formatHeight(cm)} ({cm} cm)
-                </option>
-              ))}
-            </Select>
-          </Field>
-        </div>
-        <Field label="Profile created by">
+            ))}
+          </Select>
+        </Field>
+
+        <Field label="Height">
+          <Select value={state.heightCm} onChange={set("heightCm")}>
+            <option value="">Prefer not to say</option>
+            {HEIGHTS_CM.map((cm) => (
+              <option key={cm} value={cm}>
+                {formatHeight(cm)} ({cm} cm)
+              </option>
+            ))}
+          </Select>
+        </Field>
+
+        <Field label="Profile managed by">
           <Select value={state.managedBy} onChange={set("managedBy")}>
             {Object.entries(MANAGED_BY_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
@@ -194,136 +184,147 @@ export function ProfileForm({
             ))}
           </Select>
         </Field>
-      </Section>
 
-      <Section title="Background">
-        <div className="grid gap-4 sm:grid-cols-3">
-          <Field label="Religion">
-            <Select value={state.religion} onChange={set("religion")}>
-              <option value="">Prefer not to say</option>
-              {RELIGIONS.map((religion) => (
-                <option key={religion}>{religion}</option>
-              ))}
-            </Select>
-          </Field>
-          <Field label="Community" hint="Optional">
-            <Input
-              maxLength={60}
-              value={state.community}
-              onChange={set("community")}
-            />
-          </Field>
-          <Field label="Mother tongue">
-            <Input
-              maxLength={40}
-              placeholder="Hindi"
-              value={state.motherTongue}
-              onChange={set("motherTongue")}
-            />
-          </Field>
-        </div>
-      </Section>
+        <Field label="Religion">
+          <Select value={state.religion} onChange={set("religion")}>
+            {RELIGIONS_LIST.map((religion) => (
+              <option key={religion} value={religion}>
+                {religion}
+              </option>
+            ))}
+          </Select>
+        </Field>
+      </div>
 
-      <Section title="Where you live">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="City">
-            <Input
-              required
-              minLength={2}
-              maxLength={60}
-              placeholder="Pune"
-              value={state.city}
-              onChange={set("city")}
-            />
-          </Field>
-          <Field label="State">
-            <Input
-              maxLength={60}
-              placeholder="Maharashtra"
-              value={state.state}
-              onChange={set("state")}
-            />
-          </Field>
-        </div>
-      </Section>
+      {/* Community & Location */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <Field label="Community / Caste (Optional)">
+          <Input
+            placeholder="e.g. Agarwal, Brahmin, Khatri"
+            list="community-options"
+            maxLength={60}
+            value={state.community}
+            onChange={set("community")}
+          />
+          <datalist id="community-options">
+            {COMMUNITIES_LIST.map((c) => (
+              <option key={c} value={c} />
+            ))}
+          </datalist>
+        </Field>
 
-      <Section title="Education and work">
-        <div className="grid gap-4 sm:grid-cols-2">
-          <Field label="Highest education">
-            <Input
-              maxLength={120}
-              placeholder="B.Tech, IIT Delhi"
-              value={state.education}
-              onChange={set("education")}
-            />
-          </Field>
-          <Field label="Profession">
-            <Input
-              maxLength={120}
-              placeholder="Software engineer"
-              value={state.profession}
-              onChange={set("profession")}
-            />
-          </Field>
-        </div>
-      </Section>
-
-      <Section title="In your words">
-        <Field
-          label="About you"
-          hint="A few honest lines about you, your family, and what you value."
-        >
-          <Textarea
-            rows={5}
-            maxLength={1000}
-            value={state.about}
-            onChange={set("about")}
+        <Field label="Mother tongue">
+          <Input
+            maxLength={40}
+            placeholder="e.g. Hindi, Punjabi, Bengali"
+            value={state.motherTongue}
+            onChange={set("motherTongue")}
           />
         </Field>
-      </Section>
 
-      <Section title="Looking for">
+        <Field label="Current city">
+          <Input
+            required
+            minLength={2}
+            maxLength={60}
+            placeholder="e.g. Bengaluru, Mumbai, Pune"
+            value={state.city}
+            onChange={set("city")}
+          />
+        </Field>
+
+        <Field label="State / Region">
+          <Input
+            maxLength={60}
+            placeholder="e.g. Karnataka, Maharashtra"
+            value={state.state}
+            onChange={set("state")}
+          />
+        </Field>
+      </div>
+
+      {/* Education & Career */}
+      <div className="grid md:grid-cols-2 gap-4">
+        <Field label="Highest education">
+          <Input
+            maxLength={120}
+            placeholder="e.g. B.Tech (IIT), MBA (IIM)"
+            list="education-options"
+            value={state.education}
+            onChange={set("education")}
+          />
+          <datalist id="education-options">
+            {EDUCATION_LIST.map((edu) => (
+              <option key={edu} value={edu} />
+            ))}
+          </datalist>
+        </Field>
+
+        <Field label="Profession / Occupation">
+          <Input
+            maxLength={120}
+            placeholder="e.g. Software Engineer, Doctor, CA"
+            value={state.profession}
+            onChange={set("profession")}
+          />
+        </Field>
+      </div>
+
+      {/* About Section */}
+      <Field
+        label="About you"
+        hint="A few thoughtful lines about your values, lifestyle, and family background."
+      >
+        <Textarea
+          rows={4}
+          maxLength={1000}
+          placeholder="Share a little about who you are, what brings you joy, and what you seek in a life partner..."
+          value={state.about}
+          onChange={set("about")}
+        />
+      </Field>
+
+      {/* Partner Preferences */}
+      <div className="border-t border-border pt-6">
+        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
+          Partner Age Preference
+        </p>
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Partner age from">
+          <Field label="Age from">
             <Input
               type="number"
               min={18}
               max={80}
+              placeholder="18"
               value={state.partnerAgeMin}
               onChange={set("partnerAgeMin")}
             />
           </Field>
-          <Field label="to">
+          <Field label="Age to">
             <Input
               type="number"
               min={18}
               max={80}
+              placeholder="80"
               value={state.partnerAgeMax}
               onChange={set("partnerAgeMax")}
             />
           </Field>
         </div>
-      </Section>
+      </div>
 
-      {error && <Notice>{error}</Notice>}
-      <Button type="submit" busy={busy} className="w-full sm:w-auto">
-        {submitLabel}
-      </Button>
+      {error && <Notice tone="error">{error}</Notice>}
+
+      <div className="flex justify-end pt-4">
+        <Button
+          type="submit"
+          busy={busy}
+          className="min-h-11 px-8 rounded-lg bg-primary text-primary-foreground font-semibold flex items-center gap-2"
+        >
+          <span>{submitLabel}</span>
+          <ArrowRight className="size-4" />
+        </Button>
+      </div>
     </form>
-  );
-}
-
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <fieldset className="space-y-4">
-      <legend className="mb-3 font-serif text-lg text-ink">{title}</legend>
-      {children}
-    </fieldset>
   );
 }

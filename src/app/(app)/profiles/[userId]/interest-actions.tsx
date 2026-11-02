@@ -65,11 +65,11 @@ export function InterestActions({
   if (rel?.status === "accepted") {
     content = (
       <>
-        <p className="font-serif text-xl text-ink">
-          {justMatched ? "It’s a match!" : "You are matched"}
+        <p className="font-heading text-lg font-bold text-foreground">
+          {justMatched ? "It’s a match! 🎉" : "You are matched"}
         </p>
-        <p className="text-sm text-muted">
-          You can now message {firstName} directly.
+        <p className="text-xs text-muted-foreground">
+          You and {firstName} have expressed mutual interest. You can now chat directly.
         </p>
         <ButtonLink href={`/matches/${rel.interestId}`} className="w-full">
           Send a message
@@ -79,9 +79,9 @@ export function InterestActions({
   } else if (rel?.status === "pending" && rel.direction === "sent") {
     content = (
       <>
-        <p className="font-serif text-xl text-ink">Interest sent</p>
-        <p className="text-sm text-muted">
-          We will let you know when {firstName} responds.
+        <p className="font-heading text-lg font-bold text-foreground">Interest sent</p>
+        <p className="text-xs text-muted-foreground">
+          We will notify you as soon as {firstName} responds.
         </p>
         <Button variant="ghost" busy={busy} onClick={withdraw}>
           Withdraw interest
@@ -91,13 +91,13 @@ export function InterestActions({
   } else if (rel?.status === "pending" && rel.direction === "received") {
     content = (
       <>
-        <p className="font-serif text-xl text-ink">
+        <p className="font-heading text-lg font-bold text-foreground">
           {firstName} is interested in you
         </p>
-        <p className="text-sm text-muted">
+        <p className="text-xs text-muted-foreground">
           Accept to start a conversation with {firstName}.
         </p>
-        <div className="grid grid-cols-2 gap-2">
+        <div className="grid grid-cols-2 gap-2 pt-1">
           <Button busy={busy} onClick={() => respond(true)}>
             Accept
           </Button>
@@ -113,17 +113,16 @@ export function InterestActions({
     );
   } else if (rel?.status === "declined" && rel.direction === "sent") {
     content = (
-      <p className="text-sm text-muted">
-        {firstName} is not available right now.
+      <p className="text-xs text-muted-foreground">
+        {firstName} is not available for new introductions at this time.
       </p>
     );
   } else {
     content = (
       <>
-        <p className="font-serif text-xl text-ink">Interested in {firstName}?</p>
-        <p className="text-sm text-muted">
-          If {firstName} accepts, you can chat. Your contact details stay
-          private.
+        <p className="font-heading text-lg font-bold text-foreground">Interested in {firstName}?</p>
+        <p className="text-xs text-muted-foreground">
+          Send an interest. Chat opens when both of you say yes. Your contact details stay private.
         </p>
         {showNote ? (
           <Textarea
@@ -136,23 +135,23 @@ export function InterestActions({
         ) : (
           <button
             type="button"
-            className="text-left text-sm text-maroon hover:underline"
+            className="text-left text-xs text-primary font-semibold hover:underline"
             onClick={() => setShowNote(true)}
           >
-            + Add a short note
+            + Add a personalized note
           </button>
         )}
         <Button busy={busy} onClick={send} className="w-full">
-          Send interest
+          Express interest
         </Button>
       </>
     );
   }
 
   return (
-    <div className="space-y-3 rounded-2xl border border-line bg-card p-5">
+    <div className="space-y-3 rounded-xl border border-border bg-card p-5 shadow-sm">
       {content}
-      {error && <Notice>{error}</Notice>}
+      {error && <Notice tone="error">{error}</Notice>}
     </div>
   );
 }

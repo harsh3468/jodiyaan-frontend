@@ -35,19 +35,21 @@ export function SafetyActions({
 
   if (mode === "block") {
     return (
-      <div className="space-y-3 rounded-2xl border border-line bg-card p-5">
-        <p className="text-sm text-ink">
-          Block {name}? You will no longer see each other, and any chat will
-          close.
+      <div className="space-y-3 rounded-xl border border-border bg-card p-5 shadow-sm">
+        <p className="text-sm font-semibold text-foreground">
+          Block {name}?
         </p>
-        {error && <Notice>{error}</Notice>}
-        <div className="flex gap-2">
+        <p className="text-xs text-muted-foreground">
+          You will no longer see each other’s profiles, and any existing chat will close immediately.
+        </p>
+        {error && <Notice tone="error">{error}</Notice>}
+        <div className="flex gap-2 pt-1">
           <Button
             variant="danger"
             busy={busy}
             onClick={() => run(() => api.block(userId))}
           >
-            Block
+            Block member
           </Button>
           <Button variant="ghost" onClick={() => setMode("idle")}>
             Cancel
@@ -60,15 +62,17 @@ export function SafetyActions({
   if (mode === "report") {
     return (
       <form
-        className="space-y-4 rounded-2xl border border-line bg-card p-5"
+        className="space-y-4 rounded-xl border border-border bg-card p-5 shadow-sm"
         onSubmit={(e) => {
           e.preventDefault();
           run(() => api.report(userId, reason, details));
         }}
       >
-        <p className="text-sm text-ink">
-          Reports are private. We will review this profile, and {name} will be
-          blocked for you.
+        <p className="text-sm font-semibold text-foreground">
+          Report profile
+        </p>
+        <p className="text-xs text-muted-foreground">
+          Reports are 100% confidential. Our safety team will review this profile within 24 hours.
         </p>
         <Field label="Reason">
           <Select
@@ -86,12 +90,13 @@ export function SafetyActions({
           <Textarea
             rows={3}
             maxLength={1000}
+            placeholder="Help our safety team understand what happened..."
             value={details}
             onChange={(e) => setDetails(e.target.value)}
           />
         </Field>
-        {error && <Notice>{error}</Notice>}
-        <div className="flex gap-2">
+        {error && <Notice tone="error">{error}</Notice>}
+        <div className="flex gap-2 pt-1">
           <Button type="submit" variant="danger" busy={busy}>
             Submit report
           </Button>
@@ -104,15 +109,18 @@ export function SafetyActions({
   }
 
   return (
-    <div className="flex gap-4 text-sm">
+    <div className="flex gap-4 text-xs font-semibold">
       <button
-        className="text-muted hover:text-ink"
+        type="button"
+        className="text-muted-foreground hover:text-foreground transition-colors"
         onClick={() => setMode("block")}
       >
         Block {name}
       </button>
+      <span className="text-border">·</span>
       <button
-        className="text-muted hover:text-red-700"
+        type="button"
+        className="text-muted-foreground hover:text-destructive transition-colors"
         onClick={() => setMode("report")}
       >
         Report profile

@@ -8,6 +8,7 @@ import {
   Notice,
   PageHeader,
   PageLoader,
+  VerifiedBadge,
 } from "@/components/ui";
 import { api } from "@/lib/api";
 import { formatTime } from "@/lib/format";
@@ -20,22 +21,22 @@ export function MatchesView() {
   return (
     <>
       <PageHeader
-        title="Matches"
-        subtitle="People who said yes to each other."
+        title="Messages"
+        subtitle="Meaningful conversations with mutual matches."
       />
-      {error && <Notice>{error}</Notice>}
+      {error && <Notice tone="error">{error}</Notice>}
       {loading ? (
         <PageLoader />
       ) : !data?.length ? (
-        <EmptyState title="No matches yet">
+        <EmptyState title="No messages yet">
           When someone accepts your interest, or you accept theirs, you can chat
           here.{" "}
-          <Link href="/interests" className="text-maroon hover:underline">
+          <Link href="/interests" className="text-primary font-semibold hover:underline">
             Check your interests
           </Link>
         </EmptyState>
       ) : (
-        <ul className="divide-y divide-line overflow-hidden rounded-2xl border border-line bg-card">
+        <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card shadow-sm">
           {data.map((match) => {
             const name = match.profile?.fullName ?? "Member";
             const preview = match.lastMessage
@@ -45,30 +46,37 @@ export function MatchesView() {
               <li key={match.id}>
                 <Link
                   href={`/matches/${match.id}`}
-                  className="flex items-center gap-4 px-4 py-4 transition-colors hover:bg-paper"
+                  className="flex items-center gap-4 px-5 py-4 transition-colors hover:bg-secondary/30"
                 >
                   <Avatar
                     name={name}
                     photoUrl={match.profile?.photoUrl ?? null}
-                    className="size-14 shrink-0 rounded-full text-lg"
+                    className="size-14 shrink-0 rounded-xl text-lg"
                   />
                   <div className="min-w-0 flex-1">
                     <div className="flex items-baseline justify-between gap-2">
-                      <p className="truncate font-medium text-ink">{name}</p>
-                      <span className="shrink-0 text-xs text-muted">
+                      <p className="truncate font-heading font-bold text-foreground flex items-center gap-1.5">
+                        <span>{name}</span>
+                        <VerifiedBadge />
+                      </p>
+                      <span className="shrink-0 text-xs text-muted-foreground">
                         {formatTime(
                           match.lastMessage?.createdAt ?? match.matchedAt,
                         )}
                       </span>
                     </div>
                     <p
-                      className={`truncate text-sm ${match.unreadCount ? "font-medium text-ink" : "text-muted"}`}
+                      className={`truncate text-sm mt-0.5 ${
+                        match.unreadCount
+                          ? "font-semibold text-foreground"
+                          : "text-muted-foreground"
+                      }`}
                     >
                       {preview}
                     </p>
                   </div>
                   {match.unreadCount > 0 && (
-                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-maroon text-xs font-medium text-white">
+                    <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
                       {match.unreadCount}
                     </span>
                   )}

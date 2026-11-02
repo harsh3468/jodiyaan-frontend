@@ -1,66 +1,199 @@
+import Image from "next/image";
+import Link from "next/link";
+import {
+  HeartHandshake,
+  Lock,
+  Search,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 import { RedirectIfSignedIn } from "@/components/redirect-if-signed-in";
 import { ButtonLink, Wordmark } from "@/components/ui";
+import {
+  LANDING_NAV_ITEMS,
+  QUICK_SEARCH_AGE_OPTIONS,
+  SUBTAGLINE,
+  TAGLINE,
+  TOP_INDIAN_CITIES,
+  TRUST_PILLARS,
+} from "@/lib/constants";
 
-const PROMISES = [
-  {
-    title: "Real people",
-    body: "Every member signs in with a verified email. Report or block anyone in one tap.",
-  },
-  {
-    title: "Mutual interest first",
-    body: "Chat opens only when both of you say yes. No unwanted messages.",
-  },
-  {
-    title: "Calm by design",
-    body: "A short daily list instead of endless scrolling, boosts, or ads.",
-  },
-];
+const PILLAR_ICONS = {
+  "shield-check": ShieldCheck,
+  "heart-handshake": HeartHandshake,
+  sparkles: Sparkles,
+  lock: Lock,
+};
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col">
+    <div className="min-h-screen w-full bg-background flex flex-col relative">
       <RedirectIfSignedIn />
-      <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-6 py-6">
-        <Wordmark />
-        <ButtonLink href="/login" variant="secondary">
-          Sign in
-        </ButtonLink>
-      </header>
 
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center px-6 py-16">
-        <p className="text-sm font-medium uppercase tracking-[0.2em] text-maroon">
-          Sachi jodiyaan, sache log
-        </p>
-        <h1 className="mt-4 max-w-2xl font-serif text-5xl leading-[1.1] text-ink sm:text-6xl">
-          A quieter way to find your life partner.
-        </h1>
-        <p className="mt-6 max-w-xl text-lg text-muted">
-          Create a simple profile, see a few thoughtful matches, and talk only
-          when the interest is mutual.
-        </p>
-        <div className="mt-10 flex flex-wrap gap-3">
-          <ButtonLink href="/login" className="px-7 py-3 text-base">
-            Create your profile — free
+      {/* Header */}
+      <header className="px-6 lg:px-12 py-4 bg-card border-b border-border flex items-center justify-between">
+        <Link href="/" aria-label="Jodiyaan">
+          <Wordmark />
+        </Link>
+
+        <nav className="hidden lg:flex gap-7 text-sm font-semibold">
+          {LANDING_NAV_ITEMS.map((item) => (
+            <Link
+              key={item.label}
+              href={item.href}
+              className="text-foreground hover:text-primary transition-colors"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </nav>
+
+        <div className="flex gap-2">
+          <ButtonLink href="/login" variant="outline">
+            Log in
+          </ButtonLink>
+          <ButtonLink href="/login" variant="primary">
+            Sign up
           </ButtonLink>
         </div>
+      </header>
 
-        <div className="mt-20 grid gap-6 sm:grid-cols-3">
-          {PROMISES.map((item) => (
-            <div
-              key={item.title}
-              className="rounded-2xl border border-line bg-card p-6"
-            >
-              <h2 className="font-serif text-xl text-ink">{item.title}</h2>
-              <p className="mt-2 text-sm leading-relaxed text-muted">
-                {item.body}
+      {/* Hero Section */}
+      <main className="flex-1">
+        <section className="px-6 lg:px-12 py-12 lg:py-16 bg-secondary">
+          <div className="max-w-6xl mx-auto grid lg:grid-cols-2 gap-10 items-center">
+            <div>
+              <p className="text-xs uppercase tracking-[0.25em] text-secondary-foreground font-bold">
+                Indian Matrimonial
               </p>
+              <h1 className="mt-4 text-5xl lg:text-6xl font-heading font-bold text-balance leading-tight">
+                Find your <span className="text-primary">{TAGLINE.replace("Find your ", "")}</span>
+              </h1>
+              <p className="mt-5 max-w-lg text-muted-foreground text-pretty text-base leading-relaxed">
+                {SUBTAGLINE}
+              </p>
+
+              {/* Quick Search Widget */}
+              <form
+                action="/discover"
+                className="mt-8 bg-card rounded-xl shadow-md border border-border p-5 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 items-end"
+              >
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Looking for
+                  <select
+                    name="lookingFor"
+                    className="mt-1 w-full bg-background border border-input rounded-lg p-2.5 text-sm text-foreground outline-none focus:border-primary"
+                    defaultValue="bride"
+                  >
+                    <option value="bride">Bride</option>
+                    <option value="groom">Groom</option>
+                  </select>
+                </label>
+
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Age
+                  <select
+                    name="ageRange"
+                    className="mt-1 w-full bg-background border border-input rounded-lg p-2.5 text-sm text-foreground outline-none focus:border-primary"
+                    defaultValue="24-30"
+                  >
+                    {QUICK_SEARCH_AGE_OPTIONS.map((opt) => (
+                      <option key={opt.label} value={`${opt.min}-${opt.max}`}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Location
+                  <select
+                    name="city"
+                    className="mt-1 w-full bg-background border border-input rounded-lg p-2.5 text-sm text-foreground outline-none focus:border-primary"
+                    defaultValue="Bengaluru"
+                  >
+                    <option value="">All India</option>
+                    {TOP_INDIAN_CITIES.map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+
+                <ButtonLink
+                  href="/login"
+                  variant="primary"
+                  className="w-full flex items-center justify-center gap-2"
+                >
+                  <Search className="size-4" />
+                  Find matches
+                </ButtonLink>
+              </form>
             </div>
-          ))}
-        </div>
+
+            {/* Feature Card / Hero Highlight */}
+            <div className="rounded-2xl bg-gradient-to-br from-[#72242E] to-[#401118] p-8 h-96 flex flex-col justify-between overflow-hidden relative shadow-theme text-primary-foreground border border-border/20">
+              <div className="flex items-center gap-4">
+                <Image
+                  src="/app-icon.jpg"
+                  alt="Jodiyaan Emblem"
+                  width={64}
+                  height={64}
+                  priority
+                  className="size-16 rounded-xl shadow-md border border-white/20 object-cover shrink-0"
+                />
+                <div>
+                  <p className="font-heading font-bold text-lg text-primary-foreground">
+                    Jodiyaan Matchmaking
+                  </p>
+                  <p className="text-xs text-primary-foreground/80">
+                    Rooted in Indian traditions & values
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-card/95 backdrop-blur rounded-xl p-6 shadow-md w-full border border-border text-foreground">
+                <p className="font-heading text-xl font-bold text-foreground">
+                  A beginning worth celebrating
+                </p>
+                <p className="mt-1.5 text-xs sm:text-sm text-muted-foreground leading-relaxed">
+                  Thoughtful profiles. Verified backgrounds. Safer conversations. Families welcome.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Trust Pillars */}
+        <section className="px-6 lg:px-12 py-16">
+          <div className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {TRUST_PILLARS.map((pillar) => {
+              const Icon =
+                PILLAR_ICONS[pillar.icon as keyof typeof PILLAR_ICONS] ??
+                ShieldCheck;
+              return (
+                <div
+                  key={pillar.title}
+                  className="bg-card border border-border rounded-xl p-6 shadow-sm hover:border-primary/40 transition-colors"
+                >
+                  <Icon className="size-8 text-tertiary" />
+                  <h2 className="mt-3 text-lg font-bold text-foreground">
+                    {pillar.title}
+                  </h2>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    {pillar.body}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </section>
       </main>
 
-      <footer className="border-t border-line py-6 text-center text-xs text-muted">
-        Jodiyaan · Made with care in India
+      {/* Footer */}
+      <footer className="border-t border-border bg-card px-6 py-6 text-center text-xs text-muted-foreground">
+        Jodiyaan · Modern Indian Matrimonial · Sachi jodiyaan, sache log
       </footer>
     </div>
   );

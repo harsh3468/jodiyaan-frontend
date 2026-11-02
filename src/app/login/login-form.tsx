@@ -47,14 +47,17 @@ export function LoginForm() {
 
   if (step === "email") {
     return (
-      <form onSubmit={requestCode} className="space-y-5">
+      <form onSubmit={requestCode} className="space-y-6">
         <div>
-          <h1 className="font-serif text-2xl text-ink">Welcome</h1>
-          <p className="mt-1 text-sm text-muted">
-            Sign in or create an account with your email. No password needed.
+          <h1 className="font-heading text-2xl font-bold text-foreground">
+            Welcome to Jodiyaan
+          </h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Sign in to continue your matchmaking journey.
           </p>
         </div>
-        <Field label="Email">
+
+        <Field label="Email address">
           <Input
             type="email"
             required
@@ -65,21 +68,32 @@ export function LoginForm() {
             onChange={(e) => setEmail(e.target.value)}
           />
         </Field>
-        {error && <Notice>{error}</Notice>}
+
+        {error && <Notice tone="error">{error}</Notice>}
+
         <Button type="submit" busy={busy} className="w-full">
-          Send code
+          Send verification code
         </Button>
+
+        <p className="text-center text-xs text-muted-foreground leading-relaxed">
+          No password needed. By continuing, you agree to treat all members with respect and verify your intentions for marriage.
+        </p>
       </form>
     );
   }
 
   return (
-    <form onSubmit={verify} className="space-y-5">
+    <form onSubmit={verify} className="space-y-6">
       <div>
-        <h1 className="font-serif text-2xl text-ink">Check your email</h1>
-        {info && <p className="mt-1 text-sm text-muted">{info}</p>}
+        <h1 className="font-heading text-2xl font-bold text-foreground">
+          Check your email
+        </h1>
+        {info && (
+          <p className="mt-1 text-sm text-muted-foreground">{info}</p>
+        )}
       </div>
-      <Field label="Sign-in code">
+
+      <Field label="6-Digit Verification Code">
         <Input
           inputMode="numeric"
           autoComplete="one-time-code"
@@ -88,19 +102,22 @@ export function LoginForm() {
           pattern="\d{6}"
           maxLength={6}
           placeholder="123456"
-          className="text-center text-2xl tracking-[0.5em]"
+          className="text-center font-mono text-2xl tracking-[0.4em]"
           value={code}
           onChange={(e) => setCode(e.target.value.replace(/\D/g, ""))}
         />
       </Field>
-      {error && <Notice>{error}</Notice>}
+
+      {error && <Notice tone="error">{error}</Notice>}
+
       <Button type="submit" busy={busy} className="w-full">
-        Continue
+        Sign in to account
       </Button>
-      <div className="flex justify-between text-sm">
+
+      <div className="flex justify-between items-center text-sm pt-2">
         <button
           type="button"
-          className="text-muted hover:text-ink"
+          className="text-muted-foreground hover:text-foreground font-semibold"
           onClick={() => {
             setStep("email");
             setCode("");
@@ -111,7 +128,7 @@ export function LoginForm() {
         </button>
         <button
           type="button"
-          className="text-maroon hover:underline"
+          className="text-primary hover:underline font-semibold"
           disabled={busy}
           onClick={() => requestCode()}
         >

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Screen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Poppins:wght@100..900&family=Fira+Code:wght@300..700&family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet" />
+    <link id="theme-fonts" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://code.iconify.design/iconify-icon/3.0.0/iconify-icon.min.js"></script>
+    <style type="text/tailwindcss">
+      @import "tailwindcss";
+      @theme inline {
+        --color-background: var(--background);
+        --color-foreground: var(--foreground);
+        --color-primary: var(--primary);
+        --color-primary-foreground: var(--primary-foreground);
+        --color-secondary: var(--secondary);
+        --color-secondary-foreground: var(--secondary-foreground);
+        --color-tertiary: var(--tertiary);
+        --color-tertiary-foreground: var(--tertiary-foreground);
+        --color-muted: var(--muted);
+        --color-muted-foreground: var(--muted-foreground);
+        --color-accent: var(--accent);
+        --color-accent-foreground: var(--accent-foreground);
+        --color-destructive: var(--destructive);
+        --color-destructive-foreground: var(--destructive-foreground);
+        --color-card: var(--card);
+        --color-card-foreground: var(--card-foreground);
+        --color-popover: var(--popover);
+        --color-popover-foreground: var(--popover-foreground);
+        --color-border: var(--border);
+        --color-input: var(--input);
+        --color-ring: var(--ring);
+        --radius-sm: calc(var(--radius) - 4px);
+        --radius-md: calc(var(--radius) - 2px);
+        --radius-lg: var(--radius);
+        --font-family-sans: var(--font-sans);
+        --font-family-heading: var(--font-heading);
+        --font-family-mono: var(--font-mono);
+        /* Tailwind v4's font namespace is --font-*, NOT --font-family-*.
+         *
+         * Without this line the font-heading utility does not exist at all,
+         * so every h1–h6 the design prompt mandates (font-heading) silently
+         * inherited the body's font-sans. A user could set --font-heading a
+         * dozen times, watch the tool report success, and never see the
+         * typeface change — the "font applied but not reflected" report.
+         *
+         * font-sans and font-mono are Tailwind built-ins and already read
+         * :root, which is why only headings were broken. The fallback chain
+         * keeps themes that never set a heading font rendering the body face
+         * instead of nothing. */
+        --font-heading: var(--font-heading, var(--font-sans, ui-sans-serif, system-ui, sans-serif));
+      }
+
+      /* Every filled surface carries its own text colour.
+       *
+       * Without this, <div class="bg-accent"> inherits --foreground from
+       * <html> — a colour chosen to contrast the PAGE, not the accent fill. On
+       * a dark theme with a bright accent that renders near-white text on
+       * near-white (or near-black on near-black): the invisible text users
+       * report. Pairing each fill with its own foreground makes the readable
+       * result the default instead of something the model has to remember.
+       *
+       * These sit in @layer base deliberately. Any explicit text-* utility is
+       * in @layer utilities and therefore still wins, so an intentional colour
+       * choice is never overridden. The neutral surfaces (background, muted)
+       * are left out: --foreground is already guaranteed readable on those, and
+       * forcing --muted-foreground would wash out headings in muted panels.
+       */
+      @layer base {
+        .bg-card { color: var(--card-foreground); }
+        .bg-popover { color: var(--popover-foreground, var(--card-foreground)); }
+        .bg-primary { color: var(--primary-foreground); }
+        .bg-secondary { color: var(--secondary-foreground); }
+        .bg-accent { color: var(--accent-foreground, var(--foreground)); }
+        .bg-tertiary { color: var(--tertiary-foreground, var(--primary-foreground)); }
+        .bg-destructive { color: var(--destructive-foreground, var(--primary-foreground)); }
+      }
+      :root {
+        --background: #FDF4EB;
+        --foreground: #25181A;
+        --primary: #72242E;
+        --primary-foreground: #FFF8F2;
+        --secondary: #F6E5D6;
+        --secondary-foreground: #3A2425;
+        --tertiary: #D99B36;
+        --muted: #F6E5D6;
+        --muted-foreground: #994F4E;
+        --accent: #F2D6C8;
+        --accent-foreground: #53232A;
+        --card: #FFFBF6;
+        --card-foreground: #25181A;
+        --destructive: #B6383E;
+        --border: #EAD6C6;
+        --input: #D4A99F;
+        --ring: #72242E;
+        --radius: 0.9rem;
+        --font-sans: Inter,sans-serif;
+        --font-heading: Plus Jakarta Sans,sans-serif;
+        --font-mono: JetBrains Mono, monospace;
+        --shadow-offset-x: 0;
+        --shadow-offset-y: 10;
+        --shadow-blur: 30;
+        --shadow-spread: -8;
+        --shadow-color: rgba(15, 23, 42, 0.12);
+        --tertiary-foreground: #2C1D08;
+        --destructive-foreground: #FFF8F2;
+        --primary-text: #72242E;
+        --secondary-text: #7D6E61;
+        --tertiary-text: #9E6400;
+        --accent-text: #846C5F;
+        --destructive-text: #B6383E;
+        }
+    </style>
+    <style>
+      .brand-gradient { background-image: linear-gradient(135deg, var(--primary), var(--accent)); }
+      .shadow-theme {
+        box-shadow:
+          calc(var(--shadow-offset-x, 0) * 1px) calc(var(--shadow-offset-y, 10) * 1px)
+          calc(var(--shadow-blur, 30) * 1px) calc(var(--shadow-spread, -8) * 1px)
+          var(--shadow-color, rgba(15, 23, 42, 0.12));
+      }
+
+      /* Brand colours used as TEXT resolve to a legibility-adjusted variant.
+       *
+       * --primary and friends are tuned to look right as FILLS; painted as text
+       * on the page they are routinely too light — a #16A34A "+8.4%" on a white
+       * card measures 3.3:1. The --*-text tokens are the same hue and chroma
+       * with lightness nudged just far enough to clear AA on the page and card
+       * surfaces, so fills keep the exact brand colour while text becomes
+       * readable.
+       *
+       * This block is intentionally UNLAYERED: unlayered declarations outrank
+       * every cascade layer, so these beat Tailwind's own text-* utilities. The
+       * var() fallbacks leave documents that predate the derived tokens
+       * rendering exactly as before.
+       */
+      .text-primary { color: var(--primary-text, var(--primary)); }
+      .text-secondary { color: var(--secondary-text, var(--secondary)); }
+      .text-tertiary { color: var(--tertiary-text, var(--tertiary)); }
+      .text-accent { color: var(--accent-text, var(--accent)); }
+      .text-destructive { color: var(--destructive-text, var(--destructive)); }
+    </style>
+  </head>
+  <body>
+<div class="min-h-screen w-full bg-background flex flex-col relative"><header class="p-6 lg:px-12 flex justify-between"><div class="font-heading font-bold text-primary"><iconify-icon icon="lucide:flower-2" class="text-tertiary text-xl"></iconify-icon> Jodiyaan</div><a data-uxm-link="Jodiyaan Home" class="text-sm font-semibold text-primary">Back to home</a></header><main class="flex-1 grid lg:grid-cols-2"><section class="hidden lg:flex bg-primary text-primary-foreground p-16 flex-col justify-between"><div><p class="text-primary-foreground font-bold uppercase tracking-[0.25em] text-xs">A meaningful beginning</p><h1 class="mt-5 text-5xl font-heading font-bold text-balance">Find someone who feels like home.</h1><p class="mt-5 text-primary-foreground">Join a thoughtful community of people seeking a life partner with shared values.</p></div><div class="rounded-xl bg-accent text-foreground p-6"><iconify-icon icon="lucide:shield-check" class="text-3xl text-tertiary"></iconify-icon><p class="mt-3 font-semibold">Your privacy is our promise.</p></div></section><section class="p-6 lg:p-16 flex items-center justify-center"><div class="w-full max-w-md bg-card border border-border rounded-xl p-7 shadow-md"><h1>Welcome to Jodiyaan</h1><p class="mt-2 text-sm text-muted-foreground">Sign in to continue your matchmaking journey.</p><label class="block mt-6 text-sm font-semibold">Email address<input placeholder="you@example.com" class="mt-2 w-full p-3 rounded-lg border border-input bg-background"></label><label class="block mt-4 text-sm font-semibold">Password<input type="password" placeholder="Enter your password" class="mt-2 w-full p-3 rounded-lg border border-input bg-background"></label><div class="mt-3 text-right"><button class="text-sm text-primary font-semibold">Forgot password?</button></div><button data-uxm-link="Member Dashboard" class="mt-5 min-h-11 w-full bg-primary text-primary-foreground rounded-lg font-semibold">Sign in</button><div class="my-5 border-t border-border"></div><button data-uxm-link="Create Your Profile" class="min-h-11 w-full rounded-lg border border-primary text-primary font-semibold">Create an account</button></div></section></main></div>
+</body></html>

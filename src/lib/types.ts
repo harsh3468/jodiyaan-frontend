@@ -125,3 +125,37 @@ export interface BlockedMember {
   photoUrl: string | null;
   blockedAt: string;
 }
+
+export interface ProfileFormState {
+  fullName: string;
+  gender: Gender | "";
+  dateOfBirth: string;
+  maritalStatus: MaritalStatus;
+  managedBy: ManagedBy;
+  heightCm: string;
+  religion: string;
+  community: string;
+  motherTongue: string;
+  city: string;
+  state: string;
+  education: string;
+  profession: string;
+  about: string;
+  partnerAgeMin: string;
+  partnerAgeMax: string;
+}
+
+export interface ProfileFormProps {
+  profile?: OwnProfile;
+  submitLabel: string;
+  onSubmit: (input: ProfileInput) => Promise<void>;
+}
+
+export interface DiscoverFilters {
+  ageMin: string;
+  ageMax: string;
+  city: string;
+  religion: string;
+}
+
+export type InterestTab = "received" | "sent";

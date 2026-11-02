@@ -2,9 +2,23 @@
 
 import Link from "next/link";
 import { useParams } from "next/navigation";
+import { useState } from "react";
+import {
+  ArrowLeft,
+  Heart,
+  MessageCircle,
+  Share2,
+} from "lucide-react";
 import { useAuth } from "@/components/auth-provider";
-import { Avatar, ButtonLink, Notice, PageLoader } from "@/components/ui";
+import {
+  Avatar,
+  ButtonLink,
+  Notice,
+  PageLoader,
+  VerifiedBadge,
+} from "@/components/ui";
 import { api } from "@/lib/api";
+import { PROFILE_TABS } from "@/lib/constants";
 import {
   compact,
   formatHeight,
@@ -19,6 +33,9 @@ import { SafetyActions } from "./safety-actions";
 export function ProfileView() {
   const { userId } = useParams<{ userId: string }>();
   const { user } = useAuth();
+  const [activeTab, setActiveTab] = useState<string>("about");
+  const [copied, setCopied] = useState(false);
+
   const { data: profile, error, loading, setData } = useApi(userId, () =>
     api.profile(userId),
   );
@@ -27,9 +44,12 @@ export function ProfileView() {
   if (error || !profile) {
     return (
       <div className="space-y-4">
-        <Notice>{error ?? "Profile not found."}</Notice>
-        <Link href="/discover" className="text-sm text-maroon hover:underline">
-          ← Back to Discover
+        <Notice tone="error">{error ?? "Profile not found."}</Notice>
+        <Link
+          href="/discover"
+          className="text-sm font-semibold text-primary hover:underline flex items-center gap-1.5"
+        >
+          <ArrowLeft className="size-4" /> Back to matches
         </Link>
       </div>
     );
@@ -37,6 +57,7 @@ export function ProfileView() {
 
   const isOwn = user?.id === profile.userId;
   const firstName = profile.fullName.split(" ")[0];
+
   const details: [string, string | null][] = [
     ["Marital status", MARITAL_STATUS_LABELS[profile.maritalStatus]],
     ["Height", formatHeight(profile.heightCm)],
@@ -48,92 +69,270 @@ export function ProfileView() {
     ["Lives in", compact(profile.city, profile.state, profile.country)],
     ["Profile created by", MANAGED_BY_LABELS[profile.managedBy]],
   ];
+
   const lookingFor =
     profile.partnerAgeMin || profile.partnerAgeMax
-      ? `${profile.partnerAgeMin ?? 18}–${profile.partnerAgeMax ?? 80} years`
+      ? `${profile.partnerAgeMin ?? 18} – ${profile.partnerAgeMax ?? 80} years`
       : null;
 
+  const quickBadges = [
+    profile.religion,
+    profile.community,
+    profile.education,
+    profile.profession,
+  ].filter(Boolean) as string[];
+
+  function handleShare() {
+    if (typeof window !== "undefined") {
+      navigator.clipboard?.writeText(window.location.href);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }
+
   return (
-    <div className="grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-      <div className="space-y-4">
-        <Avatar
-          name={profile.fullName}
-          photoUrl={profile.photoUrl}
-          className="aspect-[4/5] w-full rounded-3xl text-7xl"
-        />
-        {isOwn ? (
-          <Notice tone="info">
-            This is how other members see your profile.{" "}
-            <Link href="/me/edit" className="font-medium text-maroon">
-              Edit profile
-            </Link>
-          </Notice>
-        ) : (
-          <InterestActions
-            profile={profile}
-            onChange={(relationship) =>
-              setData((current) => ({ ...current!, relationship }))
-            }
-          />
-        )}
+    <div className="space-y-6">
+      {/* Top Bar Navigation */}
+      <div className="flex items-center justify-between pb-4 border-b border-border">
+        <Link
+          href="/discover"
+          className="text-sm font-semibold text-primary flex items-center gap-2 hover:underline"
+        >
+          <ArrowLeft className="size-4" />
+          <span>Back to matches</span>
+        </Link>
+
+        <button
+          type="button"
+          onClick={handleShare}
+          className="p-2 rounded-lg border border-border bg-card text-foreground hover:bg-secondary/40 text-sm flex items-center gap-1.5"
+          title="Share profile"
+        >
+          <Share2 className="size-4 text-muted-foreground" />
+          <span className="hidden sm:inline">{copied ? "Copied!" : "Share"}</span>
+        </button>
       </div>
 
-      <div>
-        <h1 className="font-serif text-4xl text-ink">
-          {profile.fullName}
-          <span className="text-muted">, {profile.age}</span>
-        </h1>
-        <p className="mt-2 text-muted">
-          {compact(profile.profession, profile.city)}
-          {formatLastActive(profile.lastActiveAt) && (
-            <span className="ml-2 text-leaf">
-              ● {formatLastActive(profile.lastActiveAt)}
-            </span>
+      <div className="grid lg:grid-cols-[380px_1fr] gap-8">
+        {/* Left Column: Photos & Interaction */}
+        <section className="space-y-5">
+          <div className="rounded-xl bg-accent/60 border border-border overflow-hidden aspect-[4/5] relative shadow-sm flex items-center justify-center">
+            <Avatar
+              name={profile.fullName}
+              photoUrl={profile.photoUrl}
+              className="size-full text-8xl"
+            />
+            {formatLastActive(profile.lastActiveAt) && (
+              <span className="absolute left-3 top-3 rounded-full bg-card/90 backdrop-blur px-2.5 py-1 text-xs font-semibold text-emerald-800 border border-border/50">
+                ● {formatLastActive(profile.lastActiveAt)}
+              </span>
+            )}
+          </div>
+
+          {/* Photo gallery preview placeholders */}
+          <div className="grid grid-cols-4 gap-2">
+            <div className="h-16 rounded-lg bg-secondary/80 border border-border" />
+            <div className="h-16 rounded-lg bg-accent/60 border border-border" />
+            <div className="h-16 rounded-lg bg-secondary/80 border border-border" />
+            <div className="h-16 rounded-lg bg-accent/60 border border-border" />
+          </div>
+
+          {isOwn ? (
+            <Notice tone="info">
+              This is how your profile appears to potential matches.{" "}
+              <Link href="/me/edit" className="font-semibold text-primary underline">
+                Edit profile
+              </Link>
+            </Notice>
+          ) : (
+            <InterestActions
+              profile={profile}
+              onChange={(relationship) =>
+                setData((current) => ({ ...current!, relationship }))
+              }
+            />
           )}
-        </p>
-
-        {profile.about && (
-          <section className="mt-8">
-            <h2 className="font-serif text-xl text-ink">About {firstName}</h2>
-            <p className="mt-2 whitespace-pre-line leading-relaxed text-ink/90">
-              {profile.about}
-            </p>
-          </section>
-        )}
-
-        <section className="mt-8">
-          <h2 className="font-serif text-xl text-ink">Details</h2>
-          <dl className="mt-3 divide-y divide-line rounded-2xl border border-line bg-card">
-            {details
-              .filter(([, value]) => value)
-              .map(([label, value]) => (
-                <div key={label} className="flex justify-between gap-4 px-4 py-3">
-                  <dt className="text-sm text-muted">{label}</dt>
-                  <dd className="text-right text-sm text-ink">{value}</dd>
-                </div>
-              ))}
-          </dl>
         </section>
 
-        {lookingFor && (
-          <section className="mt-8">
-            <h2 className="font-serif text-xl text-ink">Looking for</h2>
-            <p className="mt-2 text-ink/90">A partner aged {lookingFor}.</p>
-          </section>
-        )}
+        {/* Right Column: Profile Content */}
+        <section className="space-y-6">
+          <div>
+            <h1 className="font-heading text-3xl sm:text-4xl font-bold text-foreground flex items-center gap-2">
+              <span>{profile.fullName}</span>
+              <VerifiedBadge />
+            </h1>
+            <p className="mt-1.5 text-sm sm:text-base text-muted-foreground">
+              {profile.age} years · {formatHeight(profile.heightCm)} ·{" "}
+              {compact(profile.city, profile.state)}
+            </p>
+          </div>
 
-        {!isOwn && (
-          <div className="mt-10 border-t border-line pt-6">
-            <SafetyActions userId={profile.userId} name={firstName} />
+          {/* Quick Info Badges */}
+          {quickBadges.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {quickBadges.map((badge) => (
+                <span
+                  key={badge}
+                  className="px-3 py-1.5 bg-secondary text-secondary-foreground rounded-lg text-xs font-semibold"
+                >
+                  {badge}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Action Row for Non-own profiles */}
+          {!isOwn && (
+            <div className="grid sm:grid-cols-3 gap-3">
+              <Link
+                href={`/matches`}
+                className="min-h-11 rounded-lg bg-card border border-border text-foreground font-semibold text-sm flex items-center justify-center gap-2 hover:bg-secondary/40"
+              >
+                <Heart className="size-4 text-primary" />
+                <span>Shortlist</span>
+              </Link>
+              <Link
+                href={`/matches`}
+                className="min-h-11 rounded-lg bg-card border border-border text-foreground font-semibold text-sm flex items-center justify-center gap-2 hover:bg-secondary/40"
+              >
+                <MessageCircle className="size-4 text-foreground" />
+                <span>Message</span>
+              </Link>
+            </div>
+          )}
+
+          {/* Tab Navigation */}
+          <div className="border-b border-border flex gap-6 overflow-x-auto text-sm font-semibold pt-2">
+            {PROFILE_TABS.map((tab) => {
+              const active = activeTab === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveTab(tab.id)}
+                  className={`pb-3 transition-colors shrink-0 ${
+                    active
+                      ? "border-b-2 border-primary text-primary"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {tab.label}
+                </button>
+              );
+            })}
           </div>
-        )}
-        {isOwn && (
-          <div className="mt-10">
-            <ButtonLink href="/me" variant="secondary">
-              Back to my profile
-            </ButtonLink>
+
+          {/* Tab Content */}
+          <div className="space-y-6 pt-2">
+            {activeTab === "about" && (
+              <div>
+                <h2 className="font-heading text-lg font-bold text-foreground">
+                  About {firstName}
+                </h2>
+                <p className="mt-2 text-sm sm:text-base leading-relaxed text-foreground/90 whitespace-pre-line">
+                  {profile.about ||
+                    `${firstName} has not added an introductory note yet.`}
+                </p>
+              </div>
+            )}
+
+            {activeTab === "family" && (
+              <div>
+                <h2 className="font-heading text-lg font-bold text-foreground">
+                  Family & Background
+                </h2>
+                <dl className="mt-3 divide-y divide-border rounded-xl border border-border bg-card">
+                  <div className="flex justify-between px-4 py-3 text-sm">
+                    <dt className="text-muted-foreground">Community</dt>
+                    <dd className="font-medium text-foreground">{profile.community || "Not specified"}</dd>
+                  </div>
+                  <div className="flex justify-between px-4 py-3 text-sm">
+                    <dt className="text-muted-foreground">Mother tongue</dt>
+                    <dd className="font-medium text-foreground">{profile.motherTongue || "Not specified"}</dd>
+                  </div>
+                  <div className="flex justify-between px-4 py-3 text-sm">
+                    <dt className="text-muted-foreground">Profile managed by</dt>
+                    <dd className="font-medium text-foreground">{MANAGED_BY_LABELS[profile.managedBy]}</dd>
+                  </div>
+                </dl>
+              </div>
+            )}
+
+            {activeTab === "education" && (
+              <div>
+                <h2 className="font-heading text-lg font-bold text-foreground">
+                  Education & Career
+                </h2>
+                <dl className="mt-3 divide-y divide-border rounded-xl border border-border bg-card">
+                  <div className="flex justify-between px-4 py-3 text-sm">
+                    <dt className="text-muted-foreground">Highest education</dt>
+                    <dd className="font-medium text-foreground">{profile.education || "Not specified"}</dd>
+                  </div>
+                  <div className="flex justify-between px-4 py-3 text-sm">
+                    <dt className="text-muted-foreground">Profession</dt>
+                    <dd className="font-medium text-foreground">{profile.profession || "Not specified"}</dd>
+                  </div>
+                  <div className="flex justify-between px-4 py-3 text-sm">
+                    <dt className="text-muted-foreground">Work city</dt>
+                    <dd className="font-medium text-foreground">{profile.city}</dd>
+                  </div>
+                </dl>
+              </div>
+            )}
+
+            {activeTab === "partner" && (
+              <div>
+                <h2 className="font-heading text-lg font-bold text-foreground">
+                  Partner Preferences
+                </h2>
+                <div className="mt-3 rounded-xl border border-border bg-card p-5">
+                  <p className="text-sm text-foreground">
+                    Looking for a partner aged:{" "}
+                    <span className="font-semibold text-primary">
+                      {lookingFor ?? "Open to all age ranges"}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* General Details Summary */}
+            <div>
+              <h2 className="font-heading text-lg font-bold text-foreground mb-3">
+                Key Details
+              </h2>
+              <dl className="divide-y divide-border rounded-xl border border-border bg-card">
+                {details
+                  .filter(([, value]) => value)
+                  .map(([label, value]) => (
+                    <div
+                      key={label}
+                      className="flex justify-between gap-4 px-4 py-3 text-sm"
+                    >
+                      <dt className="text-muted-foreground">{label}</dt>
+                      <dd className="text-right font-medium text-foreground">
+                        {value}
+                      </dd>
+                    </div>
+                  ))}
+              </dl>
+            </div>
           </div>
-        )}
+
+          {!isOwn && (
+            <div className="pt-6 border-t border-border">
+              <SafetyActions userId={profile.userId} name={firstName} />
+            </div>
+          )}
+
+          {isOwn && (
+            <div className="pt-6">
+              <ButtonLink href="/me" variant="secondary">
+                Back to my profile
+              </ButtonLink>
+            </div>
+          )}
+        </section>
       </div>
     </div>
   );

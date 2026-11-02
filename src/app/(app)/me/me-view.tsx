@@ -10,13 +10,13 @@ import {
   Notice,
   PageHeader,
   PageLoader,
+  VerifiedBadge,
 } from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
+import { PHOTO_MAX_MB } from "@/lib/constants";
 import { compact, formatHeight } from "@/lib/format";
 import type { OwnProfile } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
-
-const PHOTO_MAX_MB = 5;
 
 export function MeView() {
   const { user, signOut } = useAuth();
@@ -59,7 +59,7 @@ export function MeView() {
 
   if (profile.loading) return <PageLoader />;
   const me = profile.data;
-  if (!me) return <Notice>{profile.error ?? "Could not load your profile."}</Notice>;
+  if (!me) return <Notice tone="error">{profile.error ?? "Could not load your profile."}</Notice>;
 
   const missing = [
     !me.photoUrl && "a photo",
@@ -69,20 +69,22 @@ export function MeView() {
 
   return (
     <>
-      <PageHeader title="My profile" subtitle={user?.email} />
+      <PageHeader title="My Profile" subtitle={user?.email} />
       {error && (
         <div className="mb-6">
-          <Notice>{error}</Notice>
+          <Notice tone="error">{error}</Notice>
         </div>
       )}
 
       <div className="grid gap-8 md:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <div className="space-y-3">
-          <Avatar
-            name={me.fullName}
-            photoUrl={me.photoUrl}
-            className="aspect-[4/5] w-full rounded-3xl text-7xl"
-          />
+          <div className="rounded-xl bg-accent/60 border border-border aspect-[4/5] overflow-hidden flex items-center justify-center shadow-sm">
+            <Avatar
+              name={me.fullName}
+              photoUrl={me.photoUrl}
+              className="size-full text-7xl"
+            />
+          </div>
           <input
             ref={fileInput}
             type="file"
@@ -102,7 +104,7 @@ export function MeView() {
           >
             {me.photoUrl ? "Change photo" : "Add a photo"}
           </Button>
-          <p className="text-center text-xs text-muted">
+          <p className="text-center text-xs text-muted-foreground">
             A clear, recent photo of your face. JPG, PNG, or WebP up to{" "}
             {PHOTO_MAX_MB} MB.
           </p>
@@ -110,11 +112,11 @@ export function MeView() {
 
         <div className="space-y-6">
           <div>
-            <h2 className="font-serif text-3xl text-ink">
-              {me.fullName}
-              <span className="text-muted">, {me.age}</span>
+            <h2 className="font-heading text-3xl font-bold text-foreground flex items-center gap-2">
+              <span>{me.fullName}, {me.age}</span>
+              <VerifiedBadge />
             </h2>
-            <p className="mt-1 text-muted">
+            <p className="mt-1 text-muted-foreground">
               {compact(me.city, formatHeight(me.heightCm), me.profession)}
             </p>
           </div>
@@ -127,19 +129,19 @@ export function MeView() {
           )}
 
           <div className="flex flex-wrap gap-2">
-            <ButtonLink href="/me/edit">Edit profile</ButtonLink>
+            <ButtonLink href="/me/edit" variant="primary">Edit profile</ButtonLink>
             <ButtonLink href={`/profiles/${me.userId}`} variant="secondary">
-              See how others see you
+              See public view
             </ButtonLink>
           </div>
 
-          <section className="rounded-2xl border border-line bg-card p-5">
+          <section className="rounded-xl border border-border bg-card p-5 shadow-sm">
             <div className="flex items-center justify-between gap-4">
               <div>
-                <p className="font-medium text-ink">
+                <p className="font-heading font-bold text-foreground">
                   {me.isVisible ? "Visible in Discover" : "Hidden from Discover"}
                 </p>
-                <p className="text-sm text-muted">
+                <p className="text-sm text-muted-foreground">
                   {me.isVisible
                     ? "New members can find you."
                     : "Only your existing matches can see you."}
@@ -155,18 +157,18 @@ export function MeView() {
             </div>
           </section>
 
-          <section className="rounded-2xl border border-line bg-card p-5">
-            <p className="font-medium text-ink">Blocked members</p>
+          <section className="rounded-xl border border-border bg-card p-5 shadow-sm">
+            <p className="font-heading font-bold text-foreground">Blocked members</p>
             {!blocked.data?.length ? (
-              <p className="mt-1 text-sm text-muted">You haven’t blocked anyone.</p>
+              <p className="mt-1 text-sm text-muted-foreground">You haven’t blocked anyone.</p>
             ) : (
-              <ul className="mt-3 divide-y divide-line">
+              <ul className="mt-3 divide-y divide-border">
                 {blocked.data.map((member) => (
                   <li
                     key={member.userId}
                     className="flex items-center justify-between py-2"
                   >
-                    <span className="text-sm text-ink">{member.fullName}</span>
+                    <span className="text-sm text-foreground">{member.fullName}</span>
                     <Button
                       variant="ghost"
                       busy={busy === member.userId}

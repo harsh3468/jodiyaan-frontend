@@ -3,14 +3,19 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Avatar, Button, Notice, PageLoader } from "@/components/ui";
+import { ArrowLeft, Send } from "lucide-react";
+import {
+  Avatar,
+  Button,
+  Notice,
+  PageLoader,
+  VerifiedBadge,
+} from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
+import { POLL_HIDDEN_MS, POLL_VISIBLE_MS } from "@/lib/constants";
 import { formatTime } from "@/lib/format";
 import type { MessageView } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
-
-const POLL_VISIBLE_MS = 4_000;
-const POLL_HIDDEN_MS = 15_000;
 
 export function ChatView() {
   const { id } = useParams<{ id: string }>();
@@ -86,9 +91,12 @@ export function ChatView() {
   if (match.error || !match.data) {
     return (
       <div className="space-y-4">
-        <Notice>{match.error ?? "This chat is no longer available."}</Notice>
-        <Link href="/matches" className="text-sm text-maroon hover:underline">
-          ← Back to matches
+        <Notice tone="error">{match.error ?? "This chat is no longer available."}</Notice>
+        <Link
+          href="/matches"
+          className="text-sm font-semibold text-primary hover:underline flex items-center gap-1.5"
+        >
+          <ArrowLeft className="size-4" /> Back to messages
         </Link>
       </div>
     );
@@ -98,32 +106,44 @@ export function ChatView() {
   const name = profile?.fullName ?? "Member";
 
   return (
-    <div className="-my-8 flex h-[calc(100dvh-4rem-5rem)] flex-col sm:h-[calc(100dvh-4rem)]">
-      <div className="flex items-center gap-3 border-b border-line py-3">
-        <Link href="/matches" className="text-muted hover:text-ink" aria-label="Back">
-          ←
-        </Link>
-        <Link
-          href={profile ? `/profiles/${profile.userId}` : "#"}
-          className="flex items-center gap-3"
-        >
-          <Avatar
-            name={name}
-            photoUrl={profile?.photoUrl ?? null}
-            className="size-10 rounded-full"
-          />
-          <div>
-            <p className="font-medium text-ink">{name}</p>
-            <p className="text-xs text-muted">View profile</p>
-          </div>
-        </Link>
+    <div className="-my-6 flex h-[calc(100dvh-4rem-5rem)] flex-col sm:h-[calc(100dvh-5rem)]">
+      {/* Chat header */}
+      <div className="flex items-center justify-between border-b border-border bg-card px-4 py-3 rounded-t-xl">
+        <div className="flex items-center gap-3">
+          <Link
+            href="/matches"
+            className="text-muted-foreground hover:text-foreground p-1"
+            aria-label="Back to messages"
+          >
+            <ArrowLeft className="size-5" />
+          </Link>
+          <Link
+            href={profile ? `/profiles/${profile.userId}` : "#"}
+            className="flex items-center gap-3"
+          >
+            <Avatar
+              name={name}
+              photoUrl={profile?.photoUrl ?? null}
+              className="size-10 rounded-xl"
+            />
+            <div>
+              <p className="font-heading font-bold text-foreground text-sm flex items-center gap-1">
+                <span>{name}</span>
+                <VerifiedBadge />
+              </p>
+              <p className="text-xs text-primary font-semibold hover:underline">
+                View profile
+              </p>
+            </div>
+          </Link>
+        </div>
       </div>
 
-      <div className="flex-1 space-y-2 overflow-y-auto py-4">
-        <p className="mx-auto mb-4 max-w-md rounded-xl bg-blush px-4 py-2 text-center text-xs text-muted">
-          You matched {formatTime(match.data.matchedAt)}. Never send money or
-          share bank details. Report anyone who asks.
-        </p>
+      {/* Messages area */}
+      <div className="flex-1 space-y-3 overflow-y-auto p-4 bg-background">
+        <div className="mx-auto mb-4 max-w-md rounded-xl bg-accent/60 border border-border p-3 text-center text-xs text-foreground/80 leading-relaxed shadow-sm">
+          You matched on {formatTime(match.data.matchedAt)}. For your safety, never send money or share bank details.
+        </div>
         {!loaded && !error && <PageLoader />}
         {messages.map((message) => (
           <div
@@ -131,17 +151,19 @@ export function ChatView() {
             className={`flex ${message.mine ? "justify-end" : "justify-start"}`}
           >
             <div
-              className={`max-w-[75%] rounded-2xl px-4 py-2 ${
+              className={`max-w-[75%] rounded-xl px-4 py-2.5 shadow-sm ${
                 message.mine
-                  ? "rounded-br-sm bg-maroon text-white"
-                  : "rounded-bl-sm border border-line bg-card text-ink"
+                  ? "bg-primary text-primary-foreground rounded-br-xs"
+                  : "border border-border bg-card text-foreground rounded-bl-xs"
               }`}
             >
-              <p className="whitespace-pre-line break-words text-[15px]">
+              <p className="whitespace-pre-line break-words text-sm leading-relaxed">
                 {message.body}
               </p>
               <p
-                className={`mt-0.5 text-right text-[11px] ${message.mine ? "text-white/70" : "text-muted"}`}
+                className={`mt-1 text-right text-[11px] ${
+                  message.mine ? "text-primary-foreground/75" : "text-muted-foreground"
+                }`}
               >
                 {formatTime(message.createdAt)}
               </p>
@@ -152,20 +174,26 @@ export function ChatView() {
       </div>
 
       {error && (
-        <div className="pb-2">
-          <Notice>{error}</Notice>
+        <div className="p-2 bg-card border-t border-border">
+          <Notice tone="error">{error}</Notice>
         </div>
       )}
-      <form onSubmit={send} className="flex gap-2 border-t border-line py-3">
+
+      {/* Message input */}
+      <form
+        onSubmit={send}
+        className="flex gap-2 border-t border-border bg-card p-3 rounded-b-xl"
+      >
         <input
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
           maxLength={2000}
-          placeholder={`Message ${name.split(" ")[0]}`}
-          className="flex-1 rounded-full border border-line bg-card px-4 py-2.5 text-[15px] outline-none focus:border-maroon"
+          placeholder={`Message ${name.split(" ")[0]}...`}
+          className="flex-1 rounded-lg border border-input bg-background px-4 py-2.5 text-sm text-foreground outline-none focus:border-primary focus:ring-2 focus:ring-primary/20"
         />
         <Button type="submit" busy={sending} disabled={!draft.trim()}>
-          Send
+          <Send className="size-4" />
+          <span className="hidden sm:inline">Send</span>
         </Button>
       </form>
     </div>

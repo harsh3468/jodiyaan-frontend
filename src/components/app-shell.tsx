@@ -2,14 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Heart, MessageCircle, Search, UserRound } from "lucide-react";
+import { APP_NAV_ITEMS } from "@/lib/constants";
 import { Wordmark } from "./ui";
 
-const NAV = [
-  { href: "/discover", label: "Discover", icon: "◎" },
-  { href: "/interests", label: "Interests", icon: "♡" },
-  { href: "/matches", label: "Matches", icon: "✉" },
-  { href: "/me", label: "Me", icon: "☺" },
-];
+const ICONS = {
+  search: Search,
+  heart: Heart,
+  "message-circle": MessageCircle,
+  user: UserRound,
+};
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -17,47 +19,52 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     pathname === href || pathname.startsWith(`${href}/`);
 
   return (
-    <div className="min-h-screen pb-20 sm:pb-0">
-      <header className="sticky top-0 z-10 border-b border-line bg-paper/90 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-5xl items-center justify-between px-4">
+    <div className="min-h-screen bg-background pb-20 sm:pb-0">
+      <header className="sticky top-0 z-20 border-b border-border bg-card/95 backdrop-blur px-6 py-4">
+        <div className="mx-auto flex max-w-7xl items-center justify-between">
           <Link href="/discover" aria-label="Jodiyaan home">
             <Wordmark />
           </Link>
-          <nav className="hidden gap-1 sm:flex">
-            {NAV.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                className={`rounded-full px-4 py-2 text-sm transition-colors ${
-                  isActive(item.href)
-                    ? "bg-blush font-medium text-maroon"
-                    : "text-muted hover:text-ink"
-                }`}
-              >
-                {item.label}
-              </Link>
-            ))}
+          <nav className="hidden items-center gap-6 text-sm font-semibold sm:flex">
+            {APP_NAV_ITEMS.map((item) => {
+              const active = isActive(item.href);
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`transition-colors ${
+                    active
+                      ? "text-primary border-b-2 border-primary pb-1"
+                      : "text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
         </div>
       </header>
 
-      <main className="mx-auto max-w-5xl px-4 py-8">{children}</main>
+      <main className="mx-auto max-w-7xl p-6 lg:p-10">{children}</main>
 
-      <nav className="fixed inset-x-0 bottom-0 z-10 grid grid-cols-4 border-t border-line bg-paper sm:hidden">
-        {NAV.map((item) => (
-          <Link
-            key={item.href}
-            href={item.href}
-            className={`flex flex-col items-center gap-0.5 py-2.5 text-xs ${
-              isActive(item.href) ? "text-maroon" : "text-muted"
-            }`}
-          >
-            <span aria-hidden className="text-lg leading-none">
-              {item.icon}
-            </span>
-            {item.label}
-          </Link>
-        ))}
+      <nav className="fixed inset-x-0 bottom-0 z-20 grid grid-cols-4 border-t border-border bg-card py-2 sm:hidden">
+        {APP_NAV_ITEMS.map((item) => {
+          const active = isActive(item.href);
+          const Icon = ICONS[item.icon as keyof typeof ICONS] ?? Search;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`flex flex-col items-center gap-1 text-xs font-semibold ${
+                active ? "text-primary" : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <Icon className="size-5" />
+              <span>{item.label}</span>
+            </Link>
+          );
+        })}
       </nav>
     </div>
   );

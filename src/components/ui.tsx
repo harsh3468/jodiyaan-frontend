@@ -1,32 +1,89 @@
+import Image from "next/image";
 import Link from "next/link";
+import { BadgeCheck, Loader2 } from "lucide-react";
 import type { ComponentProps } from "react";
 import { initials } from "@/lib/format";
 
 const cx = (...classes: (string | false | null | undefined)[]) =>
   classes.filter(Boolean).join(" ");
 
-export function Wordmark({ className }: { className?: string }) {
+export function Wordmark({
+  className,
+  size = "md",
+}: {
+  className?: string;
+  size?: "sm" | "md" | "lg" | "xl";
+}) {
+  const sizes = {
+    sm: "h-9",
+    md: "h-12 sm:h-13",
+    lg: "h-14 sm:h-16",
+    xl: "h-18 sm:h-20",
+  };
+
+  return (
+    <div className={cx("inline-flex items-center select-none", className)}>
+      <Image
+        src="/logo.png"
+        alt="Jodiyaan"
+        width={240}
+        height={88}
+        priority
+        className={cx("w-auto object-contain", sizes[size])}
+      />
+    </div>
+  );
+}
+
+export function AppIcon({
+  className,
+  size = 48,
+}: {
+  className?: string;
+  size?: number;
+}) {
+  return (
+    <Image
+      src="/app-icon.jpg"
+      alt="Jodiyaan"
+      width={size}
+      height={size}
+      className={cx("rounded-xl object-cover shadow-sm", className)}
+    />
+  );
+}
+
+export function VerifiedBadge({
+  className,
+  title = "Verified profile",
+}: {
+  className?: string;
+  title?: string;
+}) {
   return (
     <span
-      className={cx(
-        "font-serif text-2xl font-semibold tracking-tight text-maroon",
-        className,
-      )}
+      title={title}
+      aria-label={title}
+      className={cx("inline-flex items-center text-tertiary", className)}
     >
-      Jodiyaan
+      <BadgeCheck className="size-4 shrink-0 fill-tertiary/20" />
     </span>
   );
 }
 
 const BUTTON_VARIANTS = {
-  primary: "bg-maroon text-white hover:bg-maroon-dark",
-  secondary: "border border-line bg-card text-ink hover:border-muted",
-  ghost: "text-muted hover:text-ink",
-  danger: "border border-red-200 bg-card text-red-700 hover:bg-red-50",
+  primary: "bg-primary text-primary-foreground hover:opacity-95 shadow-sm",
+  secondary: "border border-border bg-card text-foreground hover:bg-secondary/40",
+  outline: "border border-primary text-primary hover:bg-primary/5",
+  tertiary: "bg-tertiary text-tertiary-foreground hover:opacity-95 shadow-sm",
+  ghost: "text-muted-foreground hover:text-foreground",
+  danger: "border border-destructive/20 bg-destructive/10 text-destructive hover:bg-destructive/20",
 };
 
+export type ButtonVariant = keyof typeof BUTTON_VARIANTS;
+
 type ButtonProps = ComponentProps<"button"> & {
-  variant?: keyof typeof BUTTON_VARIANTS;
+  variant?: ButtonVariant;
   busy?: boolean;
 };
 
@@ -43,12 +100,12 @@ export function Button({
       {...props}
       disabled={disabled || busy}
       className={cx(
-        "inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-60",
+        "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold transition-all disabled:cursor-not-allowed disabled:opacity-50",
         BUTTON_VARIANTS[variant],
         className,
       )}
     >
-      {busy && <Spinner className="size-4" />}
+      {busy && <Loader2 className="size-4 animate-spin text-current" />}
       {children}
     </button>
   );
@@ -58,12 +115,12 @@ export function ButtonLink({
   variant = "primary",
   className,
   ...props
-}: ComponentProps<typeof Link> & { variant?: keyof typeof BUTTON_VARIANTS }) {
+}: ComponentProps<typeof Link> & { variant?: ButtonVariant }) {
   return (
     <Link
       {...props}
       className={cx(
-        "inline-flex items-center justify-center rounded-full px-5 py-2.5 text-sm font-medium transition-colors",
+        "inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-5 py-2.5 text-sm font-semibold transition-all",
         BUTTON_VARIANTS[variant],
         className,
       )}
@@ -82,15 +139,17 @@ export function Field({
 }) {
   return (
     <label className="block">
-      <span className="mb-1.5 block text-sm font-medium text-ink">{label}</span>
+      <span className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </span>
       {children}
-      {hint && <span className="mt-1 block text-xs text-muted">{hint}</span>}
+      {hint && <span className="mt-1 block text-xs text-muted-foreground">{hint}</span>}
     </label>
   );
 }
 
 const inputClass =
-  "w-full rounded-xl border border-line bg-card px-3.5 py-2.5 text-[15px] text-ink outline-none transition placeholder:text-muted/70 focus:border-maroon focus:ring-2 focus:ring-maroon/15";
+  "w-full rounded-lg border border-input bg-background p-3 text-sm text-foreground outline-none transition placeholder:text-muted-foreground/60 focus:border-primary focus:ring-2 focus:ring-primary/20";
 
 export function Input(props: ComponentProps<"input">) {
   return <input {...props} className={cx(inputClass, props.className)} />;
@@ -112,14 +171,14 @@ export function Notice({
   children: React.ReactNode;
 }) {
   const tones = {
-    error: "border-red-200 bg-red-50 text-red-800",
-    success: "border-emerald-200 bg-emerald-50 text-emerald-800",
-    info: "border-line bg-blush text-ink",
+    error: "border-destructive/30 bg-destructive/10 text-destructive",
+    success: "border-emerald-300 bg-emerald-50 text-emerald-900",
+    info: "border-border bg-accent/40 text-foreground",
   };
   return (
     <p
       role={tone === "error" ? "alert" : "status"}
-      className={cx("rounded-xl border px-4 py-3 text-sm", tones[tone])}
+      className={cx("rounded-lg border px-4 py-3 text-sm", tones[tone])}
     >
       {children}
     </p>
@@ -128,20 +187,17 @@ export function Notice({
 
 export function Spinner({ className }: { className?: string }) {
   return (
-    <span
+    <Loader2
       aria-hidden
-      className={cx(
-        "inline-block size-5 animate-spin rounded-full border-2 border-current border-r-transparent",
-        className,
-      )}
+      className={cx("inline-block size-5 animate-spin text-primary", className)}
     />
   );
 }
 
 export function PageLoader() {
   return (
-    <div className="flex min-h-[50vh] items-center justify-center text-maroon">
-      <Spinner className="size-7" />
+    <div className="flex min-h-[50vh] items-center justify-center text-primary">
+      <Spinner className="size-8" />
     </div>
   );
 }
@@ -157,7 +213,7 @@ export function Avatar({
 }) {
   if (photoUrl) {
     return (
-      // Photos are already resized to WebP by the API, so next/image adds nothing.
+      // Photos are already resized to WebP by the API
       // eslint-disable-next-line @next/next/no-img-element
       <img
         src={photoUrl}
@@ -170,7 +226,7 @@ export function Avatar({
     <div
       aria-label={name}
       className={cx(
-        "flex items-center justify-center bg-blush font-serif text-maroon",
+        "flex items-center justify-center bg-accent font-heading font-semibold text-primary",
         className,
       )}
     >
@@ -187,9 +243,11 @@ export function EmptyState({
   children?: React.ReactNode;
 }) {
   return (
-    <div className="rounded-2xl border border-dashed border-line px-6 py-12 text-center">
-      <p className="font-serif text-xl text-ink">{title}</p>
-      {children && <div className="mt-2 text-sm text-muted">{children}</div>}
+    <div className="rounded-xl border border-dashed border-border bg-card px-6 py-12 text-center">
+      <p className="font-heading text-xl font-bold text-foreground">{title}</p>
+      {children && (
+        <div className="mt-2 text-sm text-muted-foreground">{children}</div>
+      )}
     </div>
   );
 }
@@ -204,12 +262,14 @@ export function PageHeader({
   action?: React.ReactNode;
 }) {
   return (
-    <div className="mb-6 flex items-end justify-between gap-4">
+    <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
       <div>
-        <h1 className="font-serif text-3xl text-ink">{title}</h1>
-        {subtitle && <p className="mt-1 text-sm text-muted">{subtitle}</p>}
+        <h1 className="font-heading text-3xl font-bold text-foreground">{title}</h1>
+        {subtitle && (
+          <p className="mt-1 text-sm text-muted-foreground">{subtitle}</p>
+        )}
       </div>
-      {action}
+      {action && <div className="shrink-0">{action}</div>}
     </div>
   );
 }
