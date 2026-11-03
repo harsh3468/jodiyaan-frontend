@@ -94,3 +94,43 @@
 .shadow-theme {
   box-shadow: 0 10px 30px -8px rgba(15, 23, 42, 0.12);
 }
+
+.hero-image-fade {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.02) 10%,
+    rgba(0, 0, 0, 0.12) 25%,
+    rgba(0, 0, 0, 0.4) 45%,
+    rgba(0, 0, 0, 0.75) 70%,
+    black 92%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(0, 0, 0, 0.02) 10%,
+    rgba(0, 0, 0, 0.12) 25%,
+    rgba(0, 0, 0, 0.4) 45%,
+    rgba(0, 0, 0, 0.75) 70%,
+    black 92%
+  );
+}
+
+@media (max-width: 1023px) {
+  .hero-image-fade {
+    -webkit-mask-image: linear-gradient(
+      to bottom,
+      black 0%,
+      black 30%,
+      rgba(0, 0, 0, 0.4) 65%,
+      transparent 90%
+    );
+    mask-image: linear-gradient(
+      to bottom,
+      black 0%,
+      black 30%,
+      rgba(0, 0, 0, 0.4) 65%,
+      transparent 90%
+    );
+  }
+}

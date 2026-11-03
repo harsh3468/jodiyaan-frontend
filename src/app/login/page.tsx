@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
-import { ArrowLeft, ShieldCheck } from "lucide-react";
+import { Suspense } from "react";
+import { ArrowLeft, Loader2, ShieldCheck } from "lucide-react";
 import { RedirectIfSignedIn } from "@/components/redirect-if-signed-in";
 import { Wordmark } from "@/components/ui";
 import { LoginForm } from "./login-form";
@@ -67,7 +68,15 @@ export default function LoginPage() {
         {/* Right form panel */}
         <section className="p-6 lg:p-16 flex items-center justify-center">
           <div className="w-full max-w-md bg-card border border-border rounded-xl p-8 shadow-md">
-            <LoginForm />
+            <Suspense
+              fallback={
+                <div className="flex justify-center py-12 text-primary">
+                  <Loader2 className="size-6 animate-spin" />
+                </div>
+              }
+            >
+              <LoginForm />
+            </Suspense>
           </div>
         </section>
       </main>

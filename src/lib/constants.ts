@@ -3,6 +3,7 @@ import type {
   OnboardingStep,
   ProfileCard,
   ProfileDetail,
+  ProfileForOption,
 } from "./types";
 
 export const APP_NAME = "Jodiyaan";
@@ -20,6 +21,23 @@ export const HERO_CONTENT = {
   verifiedBadgeText: "10,000+ Verified Matches",
   searchButtonText: "Find matches",
 } as const;
+
+export const JOURNEY_HERO_CONTENT = {
+  eyebrow: "Begin Your Journey",
+  title: "Let's find your life partner",
+  subtitle:
+    "Tell us who you're looking for to begin your personalized introduction.",
+  submitButtonText: "Begin Your Journey",
+  exploreButtonText: "Or browse verified profiles first",
+  trustNote: "100% Verified Profiles · Strict Privacy · Respectful Introductions",
+} as const;
+
+export const PROFILE_FOR_OPTIONS: ProfileForOption[] = [
+  { value: "self", label: "Myself" },
+  { value: "parent", label: "My Son / Daughter" },
+  { value: "sibling", label: "My Brother / Sister" },
+  { value: "relative", label: "A Relative / Friend" },
+];
 
 export const APPROACH_CONTENT = {
   badge: "Our Approach",

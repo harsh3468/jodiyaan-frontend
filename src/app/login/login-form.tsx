@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useState } from "react";
 import { useAuth } from "@/components/auth-provider";
 import { Button, Field, Input, Notice } from "@/components/ui";
@@ -9,6 +9,8 @@ import { api, ApiError } from "@/lib/api";
 export function LoginForm() {
   const { signIn } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const isOnboarding = searchParams.get("intent") === "onboarding";
   const [step, setStep] = useState<"email" | "code">("email");
   const [email, setEmail] = useState("");
   const [code, setCode] = useState("");
@@ -49,12 +51,28 @@ export function LoginForm() {
     return (
       <form onSubmit={requestCode} className="space-y-6">
         <div>
-          <h1 className="font-heading text-2xl font-bold text-foreground">
-            Welcome to Jodiyaan
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Sign in to continue your matchmaking journey.
-          </p>
+          {isOnboarding ? (
+            <>
+              <p className="text-xs font-bold uppercase tracking-[0.25em] text-tertiary">
+                Let&apos;s Begin Your Journey
+              </p>
+              <h1 className="mt-1 font-heading text-2xl font-bold text-foreground">
+                Create your account
+              </h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Enter your email to receive a verification code and begin your profile.
+              </p>
+            </>
+          ) : (
+            <>
+              <h1 className="font-heading text-2xl font-bold text-foreground">
+                Welcome to Jodiyaan
+              </h1>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Sign in to continue your matchmaking journey.
+              </p>
+            </>
+          )}
         </div>
 
         <Field label="Email address">

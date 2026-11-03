@@ -175,4 +175,16 @@ export interface QuickSearchFilters {
   city: string;
 }
 
+export interface JourneyStartPreferences {
+  lookingFor: "bride" | "groom";
+  profileFor: ManagedBy;
+  ageRange: string;
+  religion: string;
+}
+
+export interface ProfileForOption {
+  value: ManagedBy;
+  label: string;
+}
+
 export type InterestTab = "received" | "sent";

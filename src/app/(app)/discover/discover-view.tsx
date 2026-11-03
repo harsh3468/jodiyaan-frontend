@@ -6,8 +6,6 @@ import { ProfileCard } from "@/components/profile-card";
 import {
   Button,
   EmptyState,
-  Field,
-  Input,
   Notice,
   PageLoader,
   Select,
@@ -77,80 +75,95 @@ export function DiscoverView() {
   }
 
   const apiItems = [...(first.data?.items ?? []), ...more];
-  // If backend returns 0 items and no filters are applied, fallback to showcase sample profiles
-  const items = apiItems.length > 0 ? apiItems : Object.values(filters).some(Boolean) ? [] : SAMPLE_PROFILES;
+  // Fallback to showcase sample profiles matching UI kit reference
+  const items =
+    apiItems.length > 0
+      ? apiItems
+      : Object.values(filters).some(Boolean)
+        ? []
+        : SAMPLE_PROFILES;
   const canLoadMore = hasMore ?? first.data?.hasMore ?? false;
   const filtered = Object.values(filters).some(Boolean);
 
   return (
     <div>
-      {/* Top Header */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-border pb-6">
-        <div>
-          <p className="text-tertiary text-xs font-bold uppercase tracking-widest">
-            Discover
-          </p>
-          <h1 className="mt-1 text-3xl sm:text-4xl font-heading font-bold text-foreground">
-            Find Matches
-          </h1>
-          <p className="mt-1 text-sm text-muted-foreground">
-            Thoughtful introductions based on mutual values, background and life goals.
-          </p>
+      {/* Top Header & Tab Strip matching UI kit reference */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-border/80 pb-5">
+        <h1 className="text-3xl sm:text-4xl font-heading font-bold text-foreground">
+          Find Matches
+        </h1>
+
+        {/* Center Pill Tabs */}
+        <div className="flex items-center gap-1.5 bg-secondary/50 p-1 rounded-full border border-border/60 self-start lg:self-center">
+          {MATCH_FILTER_TABS.map((tab) => {
+            const active = activeTab === tab.id;
+            return (
+              <button
+                key={tab.id}
+                type="button"
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-5 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                  active
+                    ? "bg-primary text-primary-foreground shadow-xs"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {tab.label}
+              </button>
+            );
+          })}
         </div>
 
-        <div className="flex items-center gap-2">
+        {/* Right Sort Dropdown & Mobile Filter Button */}
+        <div className="flex items-center gap-3">
           <Button
             variant="secondary"
             onClick={() => setShowMobileFilters((s) => !s)}
-            className="lg:hidden flex items-center gap-2"
+            className="lg:hidden flex items-center gap-2 rounded-xl text-xs py-2 min-h-9"
           >
-            <SlidersHorizontal className="size-4" />
+            <SlidersHorizontal className="size-3.5" />
             <span>Filters {filtered && "●"}</span>
           </Button>
 
-          <div className="relative">
-            <button
-              type="button"
-              className="min-h-11 px-4 rounded-lg border border-border bg-card text-foreground font-semibold text-sm flex items-center gap-2 hover:bg-secondary/40 transition-colors"
-            >
-              <span>Sort: Most relevant</span>
-              <ChevronDown className="size-4 text-muted-foreground" />
-            </button>
-          </div>
+          <button
+            type="button"
+            className="text-xs sm:text-sm font-semibold text-muted-foreground hover:text-foreground flex items-center gap-1 cursor-pointer transition-colors"
+          >
+            <span>Sort: Most Relevant</span>
+            <ChevronDown className="size-4" />
+          </button>
         </div>
       </div>
 
-      {/* Main Grid: Sidebar + Matches */}
-      <div className="mt-8 grid lg:grid-cols-[280px_1fr] gap-8 items-start">
-        {/* Desktop Filter Sidebar */}
+      {/* Main Grid: Filters Sidebar + Match Cards */}
+      <div className="mt-8 grid lg:grid-cols-[250px_1fr] gap-8 items-start">
+        {/* Filter Sidebar */}
         <aside
-          className={`bg-card rounded-2xl border border-border p-5 shadow-sm ${
+          className={`bg-card rounded-2xl border border-border/80 p-5 shadow-sm ${
             showMobileFilters
               ? "fixed inset-x-4 top-24 z-30 max-h-[80vh] overflow-y-auto block lg:relative lg:inset-auto lg:top-auto lg:max-h-none"
               : "hidden lg:block"
           }`}
         >
-          <div className="flex justify-between items-center pb-4 border-b border-border">
-            <h2 className="text-base font-heading font-bold text-foreground">
+          <div className="flex justify-between items-center pb-3 border-b border-border/70">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">
               Filters
             </h2>
             <div className="flex items-center gap-2">
-              {filtered && (
-                <button
-                  type="button"
-                  onClick={reset}
-                  className="text-xs text-primary font-semibold hover:underline"
-                >
-                  Clear all
-                </button>
-              )}
+              <button
+                type="button"
+                onClick={reset}
+                className="text-xs text-primary font-semibold hover:underline cursor-pointer"
+              >
+                Clear All
+              </button>
               {showMobileFilters && (
                 <button
                   type="button"
                   onClick={() => setShowMobileFilters(false)}
                   className="lg:hidden p-1 text-muted-foreground"
                 >
-                  <X className="size-5" />
+                  <X className="size-4" />
                 </button>
               )}
             </div>
@@ -163,9 +176,16 @@ export function DiscoverView() {
             }}
             className="mt-4 space-y-4"
           >
-            <div className="grid grid-cols-2 gap-2">
-              <Field label="Age from">
-                <Input
+            {/* Age Range */}
+            <div>
+              <div className="flex justify-between text-xs font-semibold text-foreground/80 mb-1.5">
+                <span>Age Range</span>
+                <span className="text-primary font-bold">
+                  {draft.ageMin || "22"} – {draft.ageMax || "32"}
+                </span>
+              </div>
+              <div className="grid grid-cols-2 gap-2">
+                <input
                   type="number"
                   min={18}
                   max={80}
@@ -174,11 +194,9 @@ export function DiscoverView() {
                   onChange={(e) =>
                     setDraft({ ...draft, ageMin: e.target.value })
                   }
+                  className="w-full bg-background border border-input rounded-xl px-3 py-2 text-xs text-foreground outline-none focus:border-primary"
                 />
-              </Field>
-
-              <Field label="Age to">
-                <Input
+                <input
                   type="number"
                   min={18}
                   max={80}
@@ -187,75 +205,96 @@ export function DiscoverView() {
                   onChange={(e) =>
                     setDraft({ ...draft, ageMax: e.target.value })
                   }
+                  className="w-full bg-background border border-input rounded-xl px-3 py-2 text-xs text-foreground outline-none focus:border-primary"
                 />
-              </Field>
+              </div>
             </div>
 
-            <Field label="Location">
+            {/* Location */}
+            <div>
+              <label className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                Location
+              </label>
               <Select
                 value={draft.city}
                 onChange={(e) => setDraft({ ...draft, city: e.target.value })}
+                className="text-xs py-2 rounded-xl"
               >
-                <option value="">Any city</option>
+                <option value="">Bengaluru</option>
                 {TOP_INDIAN_CITIES.map((c) => (
                   <option key={c} value={c}>
                     {c}
                   </option>
                 ))}
               </Select>
-            </Field>
+            </div>
 
-            <Field label="Religion">
-              <Select
-                value={draft.religion}
-                onChange={(e) =>
-                  setDraft({ ...draft, religion: e.target.value })
-                }
-              >
-                <option value="">Any religion</option>
-                {RELIGIONS_LIST.map((r) => (
-                  <option key={r} value={r}>
-                    {r}
-                  </option>
-                ))}
-              </Select>
-            </Field>
-
-            <Field label="Community">
+            {/* Community */}
+            <div>
+              <label className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                Community
+              </label>
               <Select
                 value={draft.community ?? ""}
                 onChange={(e) =>
                   setDraft({ ...draft, community: e.target.value })
                 }
+                className="text-xs py-2 rounded-xl"
               >
-                <option value="">Any community</option>
+                <option value="">Any</option>
                 {COMMUNITIES_LIST.map((c) => (
                   <option key={c} value={c}>
                     {c}
                   </option>
                 ))}
               </Select>
-            </Field>
+            </div>
 
-            <Field label="Education">
+            {/* Education */}
+            <div>
+              <label className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                Education
+              </label>
               <Select
                 value={draft.education ?? ""}
                 onChange={(e) =>
                   setDraft({ ...draft, education: e.target.value })
                 }
+                className="text-xs py-2 rounded-xl"
               >
-                <option value="">Any education</option>
+                <option value="">Any</option>
                 {EDUCATION_LIST.map((edu) => (
                   <option key={edu} value={edu}>
                     {edu}
                   </option>
                 ))}
               </Select>
-            </Field>
+            </div>
 
-            {/* Checkbox Options */}
-            <div className="pt-2 border-t border-border space-y-2.5">
-              <label className="flex items-center gap-2.5 text-xs font-semibold text-foreground cursor-pointer">
+            {/* Profession */}
+            <div>
+              <label className="block text-xs font-semibold text-foreground/80 mb-1.5">
+                Profession
+              </label>
+              <Select
+                value={draft.religion}
+                onChange={(e) =>
+                  setDraft({ ...draft, religion: e.target.value })
+                }
+                className="text-xs py-2 rounded-xl"
+              >
+                <option value="">Any</option>
+                {RELIGIONS_LIST.map((r) => (
+                  <option key={r} value={r}>
+                    {r}
+                  </option>
+                ))}
+              </Select>
+            </div>
+
+            {/* Checkboxes */}
+            <div className="pt-2 border-t border-border/70 space-y-2">
+              <label className="flex items-center gap-2 text-xs font-semibold text-foreground cursor-pointer">
                 <input
                   type="checkbox"
                   checked={Boolean(draft.verifiedOnly)}
@@ -264,10 +303,10 @@ export function DiscoverView() {
                   }
                   className="rounded border-input text-primary focus:ring-primary size-4"
                 />
-                <span>Verified profiles only</span>
+                <span>Verified Only</span>
               </label>
 
-              <label className="flex items-center gap-2.5 text-xs font-semibold text-foreground cursor-pointer">
+              <label className="flex items-center gap-2 text-xs font-semibold text-foreground cursor-pointer">
                 <input
                   type="checkbox"
                   checked={Boolean(draft.withPhoto)}
@@ -276,41 +315,20 @@ export function DiscoverView() {
                   }
                   className="rounded border-input text-primary focus:ring-primary size-4"
                 />
-                <span>With photo only</span>
+                <span>With Photo</span>
               </label>
             </div>
 
-            <div className="pt-3">
-              <Button type="submit" className="w-full">
-                Apply filters
+            <div className="pt-2">
+              <Button type="submit" className="w-full rounded-xl text-xs py-2.5 min-h-10 cursor-pointer">
+                Apply Filters
               </Button>
             </div>
           </form>
         </aside>
 
-        {/* Matches Section */}
+        {/* Match Cards Grid */}
         <section className="min-w-0">
-          {/* Quick Filter Tabs */}
-          <div className="flex gap-2 mb-6 overflow-x-auto pb-1">
-            {MATCH_FILTER_TABS.map((tab) => {
-              const active = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all shrink-0 ${
-                    active
-                      ? "bg-primary text-primary-foreground shadow-sm"
-                      : "bg-card border border-border text-foreground hover:bg-secondary/40"
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              );
-            })}
-          </div>
-
           {first.error && <Notice tone="error">{first.error}</Notice>}
 
           {first.loading ? (

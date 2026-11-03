@@ -26,9 +26,9 @@ export default function OnboardingPage() {
         <main className="flex-1 p-6 lg:p-12">
           <div className="max-w-3xl mx-auto">
             <div className="text-center">
-              <span className="inline-flex items-center px-3.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest border border-primary/20">
+              <p className="text-xs font-bold uppercase tracking-[0.25em] text-tertiary">
                 Step 1 of 5 · Profile Details
-              </span>
+              </p>
               <h1 className="mt-3 text-3xl sm:text-4xl font-heading font-bold text-foreground">
                 Create your profile
               </h1>

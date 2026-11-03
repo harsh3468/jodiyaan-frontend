@@ -18,6 +18,7 @@ import {
   MARITAL_STATUS_LABELS,
 } from "@/lib/format";
 import type {
+  ManagedBy,
   OwnProfile,
   ProfileFormProps,
   ProfileFormState,
@@ -25,14 +26,47 @@ import type {
 } from "@/lib/types";
 
 function initialState(profile?: OwnProfile): ProfileFormState {
+  let savedGender: "male" | "female" = "female";
+  let savedManagedBy: ManagedBy = "self";
+  let savedReligion = "Hindu";
+  let savedPartnerAgeMin = "";
+  let savedPartnerAgeMax = "";
+
+  if (!profile && typeof window !== "undefined") {
+    try {
+      const raw = sessionStorage.getItem("jodiyaan_journey_preferences");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed.lookingFor === "bride") {
+          savedGender = "male";
+        } else if (parsed.lookingFor === "groom") {
+          savedGender = "female";
+        }
+        if (parsed.profileFor) {
+          savedManagedBy = parsed.profileFor as ManagedBy;
+        }
+        if (parsed.religion) {
+          savedReligion = parsed.religion;
+        }
+        if (parsed.ageRange) {
+          const [min, max] = parsed.ageRange.split("-");
+          if (min) savedPartnerAgeMin = min;
+          if (max) savedPartnerAgeMax = max;
+        }
+      }
+    } catch {
+      // Ignore sessionStorage parsing errors
+    }
+  }
+
   return {
     fullName: profile?.fullName ?? "",
-    gender: profile?.gender ?? "female",
+    gender: profile?.gender ?? savedGender,
     dateOfBirth: profile?.dateOfBirth ?? "",
     maritalStatus: profile?.maritalStatus ?? "never_married",
-    managedBy: profile?.managedBy ?? "self",
+    managedBy: profile?.managedBy ?? savedManagedBy,
     heightCm: profile?.heightCm ? String(profile.heightCm) : "",
-    religion: profile?.religion ?? "Hindu",
+    religion: profile?.religion ?? savedReligion,
     community: profile?.community ?? "",
     motherTongue: profile?.motherTongue ?? "",
     city: profile?.city ?? "",
@@ -40,8 +74,12 @@ function initialState(profile?: OwnProfile): ProfileFormState {
     education: profile?.education ?? "",
     profession: profile?.profession ?? "",
     about: profile?.about ?? "",
-    partnerAgeMin: profile?.partnerAgeMin ? String(profile.partnerAgeMin) : "",
-    partnerAgeMax: profile?.partnerAgeMax ? String(profile.partnerAgeMax) : "",
+    partnerAgeMin: profile?.partnerAgeMin
+      ? String(profile.partnerAgeMin)
+      : savedPartnerAgeMin,
+    partnerAgeMax: profile?.partnerAgeMax
+      ? String(profile.partnerAgeMax)
+      : savedPartnerAgeMax,
   };
 }
 
@@ -103,7 +141,7 @@ export function ProfileForm({
       {/* Step 1: Basic Info */}
       <div className="space-y-4">
         <div className="flex items-center gap-2.5 pb-2 border-b border-border">
-          <span className="size-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center">
+          <span className="size-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
             {ONBOARDING_STEPS[0].id}
           </span>
           <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">
@@ -212,7 +250,7 @@ export function ProfileForm({
       {/* Step 2: Personal & Background */}
       <div className="space-y-4 pt-2">
         <div className="flex items-center gap-2.5 pb-2 border-b border-border">
-          <span className="size-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center">
+          <span className="size-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
             {ONBOARDING_STEPS[1].id}
           </span>
           <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">
@@ -270,7 +308,7 @@ export function ProfileForm({
       {/* Step 3: Education & Career */}
       <div className="space-y-4 pt-2">
         <div className="flex items-center gap-2.5 pb-2 border-b border-border">
-          <span className="size-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center">
+          <span className="size-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
             {ONBOARDING_STEPS[2].id}
           </span>
           <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">
@@ -308,7 +346,7 @@ export function ProfileForm({
       {/* Step 4: Family & Personal Note */}
       <div className="space-y-4 pt-2">
         <div className="flex items-center gap-2.5 pb-2 border-b border-border">
-          <span className="size-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center">
+          <span className="size-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
             {ONBOARDING_STEPS[3].id}
           </span>
           <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">
@@ -333,7 +371,7 @@ export function ProfileForm({
       {/* Step 5: Partner Preferences */}
       <div className="space-y-4 pt-2">
         <div className="flex items-center gap-2.5 pb-2 border-b border-border">
-          <span className="size-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center">
+          <span className="size-6 rounded-full bg-primary text-primary-foreground text-xs font-bold flex items-center justify-center">
             {ONBOARDING_STEPS[4].id}
           </span>
           <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">

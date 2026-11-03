@@ -1,25 +1,22 @@
 import Image from "next/image";
 import Link from "next/link";
-import { CheckCircle2, Search, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
+import { JourneyStartCard } from "@/components/journey-start-card";
 import { RedirectIfSignedIn } from "@/components/redirect-if-signed-in";
-import { ButtonLink, PillarIcon, Wordmark } from "@/components/ui";
+import { ButtonLink, Wordmark } from "@/components/ui";
 import {
   APPROACH_CONTENT,
   HERO_CONTENT,
   LANDING_NAV_ITEMS,
-  QUICK_SEARCH_AGE_OPTIONS,
-  RELIGIONS_LIST,
-  TOP_INDIAN_CITIES,
-  TRUST_PILLARS,
 } from "@/lib/constants";
 
 export default function Home() {
   return (
-    <div className="min-h-screen w-full bg-background flex flex-col relative selection:bg-primary/20">
+    <div className="min-h-screen w-full bg-[#FDF8F3] text-foreground flex flex-col relative selection:bg-primary/20">
       <RedirectIfSignedIn />
 
       {/* Header */}
-      <header className="px-6 lg:px-12 py-4 bg-card border-b border-border flex items-center justify-between sticky top-0 z-40 backdrop-blur-md bg-card/95">
+      <header className="px-6 lg:px-16 py-4.5 bg-[#FFFBF6]/95 backdrop-blur-md border-b border-[#EAD6C6]/60 flex items-center justify-between sticky top-0 z-40">
         <Link href="/" aria-label="Jodiyaan">
           <Wordmark size="md" />
         </Link>
@@ -37,246 +34,108 @@ export default function Home() {
         </nav>
 
         <div className="flex items-center gap-3">
-          <ButtonLink href="/login" variant="outline">
-            Log in
+          <ButtonLink
+            href="/login"
+            variant="outline"
+            className="rounded-lg px-4.5 py-2 text-sm border-primary text-primary hover:bg-primary/5 font-semibold"
+          >
+            Log In
           </ButtonLink>
-          <ButtonLink href="/login" variant="primary">
-            Sign up
+          <ButtonLink
+            href="/login"
+            variant="primary"
+            className="rounded-lg px-5 py-2 text-sm bg-primary text-primary-foreground shadow-sm hover:opacity-95 font-semibold"
+          >
+            Sign Up
           </ButtonLink>
         </div>
       </header>
 
-      {/* Hero Section */}
+      {/* Main Content */}
       <main className="flex-1">
-        <section className="px-6 lg:px-12 py-12 lg:py-18 bg-secondary/70 border-b border-border/50">
-          <div className="max-w-6xl mx-auto grid lg:grid-cols-12 gap-10 lg:gap-12 items-center">
-            {/* Left Content Column */}
-            <div className="lg:col-span-7">
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest border border-primary/20">
+        {/* Full-Bleed Panoramic Hero Section */}
+        <section className="relative w-full bg-[#FDF8F3] overflow-hidden pt-10 pb-16 lg:pt-16 lg:pb-24">
+          {/* Background Couple Photo with smooth gradient feathering on right side */}
+          <div className="absolute inset-y-0 right-0 w-full lg:w-[48%] pointer-events-none select-none overflow-hidden hero-image-fade">
+            <Image
+              src="/images/hero-couple.jpg"
+              alt="Indian wedding couple smiling together in traditional attire"
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 48vw"
+              className="object-cover object-[center_20%] lg:object-[55%_18%]"
+            />
+            {/* Soft gradient wash on left edge of the image to ensure seamless blend with #FDF8F3 */}
+            <div className="hidden lg:block absolute inset-y-0 left-0 w-44 bg-gradient-to-r from-[#FDF8F3] via-[#FDF8F3]/70 to-transparent pointer-events-none z-10" />
+            {/* Soft bottom fade */}
+            <div className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-[#FDF8F3] via-[#FDF8F3]/70 to-transparent pointer-events-none z-10" />
+            {/* Subtle mobile overlay for text contrast */}
+            <div className="lg:hidden absolute inset-0 bg-[#FDF8F3]/80 pointer-events-none z-10" />
+          </div>
+
+          <div className="max-w-6xl mx-auto px-6 lg:px-12 relative z-10">
+            {/* Left Headline Area */}
+            <div className="max-w-xl pt-4 pb-8 lg:pb-12">
+              <p className="text-xs font-bold uppercase tracking-[0.25em] text-tertiary">
                 {HERO_CONTENT.badge}
-              </span>
-
-              <h1 className="mt-4 text-4xl sm:text-5xl lg:text-6xl font-heading font-bold text-balance leading-tight text-foreground">
-                {HERO_CONTENT.titlePrefix}
-                <span className="text-primary">{HERO_CONTENT.titleHighlight}</span>
-              </h1>
-
-              <p className="mt-4 max-w-xl text-muted-foreground text-pretty text-base sm:text-lg leading-relaxed">
-                {HERO_CONTENT.subtitle}
               </p>
 
-              {/* Floating Quick Search Card */}
-              <form
-                action="/discover"
-                className="mt-8 bg-card rounded-2xl shadow-xl border border-border p-5 sm:p-6"
-              >
-                <div className="mb-4">
-                  <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground block mb-2">
-                    Looking for
-                  </span>
-                  <div className="grid grid-cols-2 gap-2 max-w-xs">
-                    <label className="flex items-center justify-center gap-2 py-2 px-4 rounded-lg border border-border bg-background cursor-pointer text-sm font-semibold text-foreground hover:bg-secondary/40 has-[:checked]:bg-primary has-[:checked]:text-primary-foreground has-[:checked]:border-primary transition-all">
-                      <input
-                        type="radio"
-                        name="lookingFor"
-                        value="bride"
-                        defaultChecked
-                        className="sr-only"
-                      />
-                      <span>Bride</span>
-                    </label>
-                    <label className="flex items-center justify-center gap-2 py-2 px-4 rounded-lg border border-border bg-background cursor-pointer text-sm font-semibold text-foreground hover:bg-secondary/40 has-[:checked]:bg-primary has-[:checked]:text-primary-foreground has-[:checked]:border-primary transition-all">
-                      <input
-                        type="radio"
-                        name="lookingFor"
-                        value="groom"
-                        className="sr-only"
-                      />
-                      <span>Groom</span>
-                    </label>
-                  </div>
-                </div>
+              <h1 className="mt-3 text-5xl sm:text-6xl lg:text-7xl font-heading font-bold text-foreground leading-[1.08] tracking-tight">
+                Find Your <br />
+                <span className="text-primary">Life Partner</span>
+              </h1>
 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
-                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Age
-                    <select
-                      name="ageRange"
-                      className="mt-1 w-full bg-background border border-input rounded-lg p-2.5 text-sm text-foreground outline-none focus:border-primary transition-colors"
-                      defaultValue="24-30"
-                    >
-                      {QUICK_SEARCH_AGE_OPTIONS.map((opt) => (
-                        <option key={opt.label} value={`${opt.min}-${opt.max}`}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Community
-                    <select
-                      name="religion"
-                      className="mt-1 w-full bg-background border border-input rounded-lg p-2.5 text-sm text-foreground outline-none focus:border-primary transition-colors"
-                      defaultValue="Hindu"
-                    >
-                      <option value="">Any religion</option>
-                      {RELIGIONS_LIST.map((rel) => (
-                        <option key={rel} value={rel}>
-                          {rel}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-
-                  <label className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Location
-                    <select
-                      name="city"
-                      className="mt-1 w-full bg-background border border-input rounded-lg p-2.5 text-sm text-foreground outline-none focus:border-primary transition-colors"
-                      defaultValue="Bengaluru"
-                    >
-                      <option value="">All India</option>
-                      {TOP_INDIAN_CITIES.map((city) => (
-                        <option key={city} value={city}>
-                          {city}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                </div>
-
-                <div className="mt-4 pt-3 border-t border-border flex justify-end">
-                  <button
-                    type="submit"
-                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 min-h-11 px-8 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:opacity-95 shadow-sm transition-all"
-                  >
-                    <Search className="size-4" />
-                    <span>{HERO_CONTENT.searchButtonText}</span>
-                  </button>
-                </div>
-              </form>
+              <p className="mt-4 text-base sm:text-lg text-muted-foreground leading-relaxed max-w-md">
+                {HERO_CONTENT.subtitle}
+              </p>
             </div>
 
-            {/* Right Hero Image Column */}
-            <div className="lg:col-span-5 relative">
-              <div className="relative aspect-[4/5] w-full max-w-md mx-auto rounded-3xl overflow-hidden shadow-2xl border-4 border-card">
-                <Image
-                  src={HERO_CONTENT.heroImage}
-                  alt="Traditional Indian wedding couple in festive bridal attire"
-                  fill
-                  priority
-                  sizes="(max-width: 1024px) 100vw, 40vw"
-                  className="object-cover object-top"
-                />
-
-                {/* Subtle gradient vignette */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent pointer-events-none" />
-
-                {/* Floating Trust Badge */}
-                <div className="absolute bottom-5 inset-x-5 bg-card/95 backdrop-blur-md rounded-2xl p-4 shadow-lg border border-border flex items-center gap-3.5">
-                  <div className="size-11 rounded-xl bg-tertiary/15 text-tertiary flex items-center justify-center shrink-0 border border-tertiary/30">
-                    <Sparkles className="size-5 fill-tertiary/20" />
-                  </div>
-                  <div>
-                    <p className="font-heading font-bold text-sm text-foreground">
-                      {HERO_CONTENT.verifiedBadgeText}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Rooted in Indian traditions & sacred trust
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* 4 Trust Pillars */}
-        <section className="px-6 lg:px-12 py-16 lg:py-20">
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              {TRUST_PILLARS.map((pillar) => (
-                <div
-                  key={pillar.title}
-                  className="bg-card border border-border rounded-2xl p-6 shadow-sm hover:border-primary/40 hover:shadow-md transition-all flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="size-12 rounded-xl bg-tertiary/10 flex items-center justify-center mb-4">
-                      <PillarIcon name={pillar.icon} className="size-6 text-tertiary" />
-                    </div>
-                    <h2 className="text-lg font-bold font-heading text-foreground capitalize">
-                      {pillar.title}
-                    </h2>
-                    <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                      {pillar.body}
-                    </p>
-                  </div>
-                </div>
-              ))}
-            </div>
+            {/* "Let's Begin Your Journey" Entry Flow Card */}
+            <JourneyStartCard />
           </div>
         </section>
 
         {/* "Our Approach" Section: Tradition, with a Modern Touch */}
-        <section className="px-6 lg:px-12 py-16 lg:py-24 bg-secondary/60 border-t border-border/50">
+        <section className="px-6 lg:px-16 py-16 lg:py-24 bg-[#FFFBF6] border-t border-border/60 relative overflow-hidden">
           <div className="max-w-6xl mx-auto grid lg:grid-cols-12 gap-10 lg:gap-14 items-center">
-            {/* Left Heritage Pavilion Image */}
-            <div className="lg:col-span-6">
-              <div className="relative aspect-[4/3] rounded-3xl overflow-hidden shadow-2xl border-4 border-card">
-                <Image
-                  src={APPROACH_CONTENT.imageSrc}
-                  alt={APPROACH_CONTENT.imageAlt}
-                  fill
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  className="object-cover"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-primary/30 to-transparent pointer-events-none" />
+            {/* Left Column: Sandstone Pavilion Inside Arched Jharokha Window Frame */}
+            <div className="lg:col-span-5 flex justify-center">
+              <div className="relative w-full max-w-sm">
+                <div className="relative aspect-[3/4] rounded-t-[140px] rounded-b-2xl overflow-hidden shadow-2xl border-4 border-card ring-1 ring-border/80">
+                  <Image
+                    src={APPROACH_CONTENT.imageSrc}
+                    alt={APPROACH_CONTENT.imageAlt}
+                    fill
+                    sizes="(max-width: 1024px) 100vw, 40vw"
+                    className="object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-primary/25 via-transparent to-transparent pointer-events-none" />
+                </div>
               </div>
             </div>
 
-            {/* Right Approach Story */}
-            <div className="lg:col-span-6 space-y-6">
-              <span className="inline-flex items-center px-3.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-bold uppercase tracking-widest border border-primary/20">
+            {/* Right Column: Story Copy matching UI kit */}
+            <div className="lg:col-span-7 space-y-5">
+              <p className="text-xs font-bold uppercase tracking-[0.25em] text-tertiary">
                 {APPROACH_CONTENT.badge}
-              </span>
+              </p>
 
-              <h2 className="text-3xl sm:text-4xl font-heading font-bold text-foreground">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-bold text-primary tracking-tight">
                 {APPROACH_CONTENT.title}
               </h2>
 
-              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed">
+              <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-xl">
                 {APPROACH_CONTENT.description}
               </p>
 
-              <div className="space-y-3 pt-2">
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="size-5 text-tertiary shrink-0 mt-0.5" />
-                  <p className="text-sm text-foreground font-medium">
-                    Hand-verified profiles with government ID and phone authenticity
-                  </p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="size-5 text-tertiary shrink-0 mt-0.5" />
-                  <p className="text-sm text-foreground font-medium">
-                    Respectful matchmaking respecting community, family, and horoscope choices
-                  </p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <CheckCircle2 className="size-5 text-tertiary shrink-0 mt-0.5" />
-                  <p className="text-sm text-foreground font-medium">
-                    Uncompromising privacy with photo blur & contact visibility controls
-                  </p>
-                </div>
-              </div>
-
-              <div className="pt-4">
+              <div className="pt-2">
                 <ButtonLink
                   href={APPROACH_CONTENT.ctaHref}
-                  variant="primary"
-                  className="inline-flex items-center gap-2 px-8"
+                  variant="outline"
+                  className="rounded-full px-7 py-3 border-border hover:border-primary text-foreground hover:text-primary font-semibold text-sm inline-flex items-center gap-2 transition-all bg-card shadow-xs"
                 >
                   <span>{APPROACH_CONTENT.ctaText}</span>
+                  <ArrowRight className="size-4" />
                 </ButtonLink>
               </div>
             </div>
@@ -285,11 +144,11 @@ export default function Home() {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border bg-card px-6 lg:px-12 py-10">
+      <footer className="border-t border-border/60 bg-card px-6 lg:px-16 py-10">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
           <Wordmark size="sm" />
           <p className="text-xs text-muted-foreground text-center">
-            Jodiyaan · Modern Indian Matrimonial · Sacred unions, sincere hearts.
+            Jodiyaan · Modern Indian Matrimonial · Sachi jodiyaan, sache log.
           </p>
           <div className="flex gap-6 text-xs text-muted-foreground">
             <Link href="/#about" className="hover:text-primary transition-colors">
