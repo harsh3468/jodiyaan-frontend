@@ -28,7 +28,7 @@ export class ApiError extends Error {
   }
 }
 
-type Query = Record<string, string | number | undefined>;
+type Query = Record<string, string | number | boolean | undefined>;
 
 async function request<T>(
   method: string,

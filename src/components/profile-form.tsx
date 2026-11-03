@@ -8,6 +8,7 @@ import {
   COMMUNITIES_LIST,
   EDUCATION_LIST,
   HEIGHTS_CM,
+  ONBOARDING_STEPS,
   PROFILE_TEXT_FIELDS,
   RELIGIONS_LIST,
 } from "@/lib/constants";
@@ -99,213 +100,264 @@ export function ProfileForm({
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
-      {/* Looking for / Gender choice */}
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-          I am registering a
-        </p>
-        <div className="grid grid-cols-2 gap-3">
-          <button
-            type="button"
-            disabled={!isCreate}
-            onClick={() => setState((s) => ({ ...s, gender: "female" }))}
-            className={`min-h-11 rounded-lg font-semibold transition-all text-sm border ${
-              state.gender === "female"
-                ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                : "bg-background text-foreground border-border hover:bg-secondary/40"
-            }`}
-          >
-            Bride (Woman)
-          </button>
-          <button
-            type="button"
-            disabled={!isCreate}
-            onClick={() => setState((s) => ({ ...s, gender: "male" }))}
-            className={`min-h-11 rounded-lg font-semibold transition-all text-sm border ${
-              state.gender === "male"
-                ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                : "bg-background text-foreground border-border hover:bg-secondary/40"
-            }`}
-          >
-            Groom (Man)
-          </button>
+      {/* Step 1: Basic Info */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2.5 pb-2 border-b border-border">
+          <span className="size-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center">
+            {ONBOARDING_STEPS[0].id}
+          </span>
+          <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">
+            {ONBOARDING_STEPS[0].label} · {ONBOARDING_STEPS[0].sublabel}
+          </h2>
+        </div>
+
+        {/* Looking for / Gender choice */}
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-2">
+            I am registering a
+          </p>
+          <div className="grid grid-cols-2 gap-3 max-w-sm">
+            <button
+              type="button"
+              disabled={!isCreate}
+              onClick={() => setState((s) => ({ ...s, gender: "female" }))}
+              className={`min-h-11 rounded-xl font-semibold transition-all text-sm border ${
+                state.gender === "female"
+                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                  : "bg-background text-foreground border-border hover:bg-secondary/40"
+              }`}
+            >
+              Bride (Woman)
+            </button>
+            <button
+              type="button"
+              disabled={!isCreate}
+              onClick={() => setState((s) => ({ ...s, gender: "male" }))}
+              className={`min-h-11 rounded-xl font-semibold transition-all text-sm border ${
+                state.gender === "male"
+                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                  : "bg-background text-foreground border-border hover:bg-secondary/40"
+              }`}
+            >
+              Groom (Man)
+            </button>
+          </div>
+        </div>
+
+        {/* Basic Essentials */}
+        <div className="grid md:grid-cols-2 gap-4">
+          <Field label="Full name">
+            <Input
+              required
+              minLength={2}
+              maxLength={80}
+              placeholder="First and last name"
+              value={state.fullName}
+              onChange={set("fullName")}
+            />
+          </Field>
+
+          <Field label="Date of birth">
+            <Input
+              type="date"
+              required
+              value={state.dateOfBirth}
+              onChange={set("dateOfBirth")}
+            />
+          </Field>
+
+          <Field label="Marital status">
+            <Select value={state.maritalStatus} onChange={set("maritalStatus")}>
+              {Object.entries(MARITAL_STATUS_LABELS).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </Select>
+          </Field>
+
+          <Field label="Height">
+            <Select value={state.heightCm} onChange={set("heightCm")}>
+              <option value="">Prefer not to say</option>
+              {HEIGHTS_CM.map((cm) => (
+                <option key={cm} value={cm}>
+                  {formatHeight(cm)} ({cm} cm)
+                </option>
+              ))}
+            </Select>
+          </Field>
+
+          <Field label="Profile managed by">
+            <Select value={state.managedBy} onChange={set("managedBy")}>
+              {Object.entries(MANAGED_BY_LABELS).map(([value, label]) => (
+                <option key={value} value={value}>
+                  {label}
+                </option>
+              ))}
+            </Select>
+          </Field>
+
+          <Field label="Religion">
+            <Select value={state.religion} onChange={set("religion")}>
+              {RELIGIONS_LIST.map((religion) => (
+                <option key={religion} value={religion}>
+                  {religion}
+                </option>
+              ))}
+            </Select>
+          </Field>
         </div>
       </div>
 
-      {/* Basic Essentials */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <Field label="Full name">
-          <Input
-            required
-            minLength={2}
-            maxLength={80}
-            placeholder="First and last name"
-            value={state.fullName}
-            onChange={set("fullName")}
-          />
-        </Field>
+      {/* Step 2: Personal & Background */}
+      <div className="space-y-4 pt-2">
+        <div className="flex items-center gap-2.5 pb-2 border-b border-border">
+          <span className="size-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center">
+            {ONBOARDING_STEPS[1].id}
+          </span>
+          <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">
+            {ONBOARDING_STEPS[1].label} · {ONBOARDING_STEPS[1].sublabel}
+          </h2>
+        </div>
 
-        <Field label="Date of birth">
-          <Input
-            type="date"
-            required
-            value={state.dateOfBirth}
-            onChange={set("dateOfBirth")}
-          />
-        </Field>
+        <div className="grid md:grid-cols-2 gap-4">
+          <Field label="Community / Caste (Optional)">
+            <Input
+              placeholder="e.g. Agarwal, Brahmin, Khatri"
+              list="community-options"
+              maxLength={60}
+              value={state.community}
+              onChange={set("community")}
+            />
+            <datalist id="community-options">
+              {COMMUNITIES_LIST.map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
+          </Field>
 
-        <Field label="Marital status">
-          <Select value={state.maritalStatus} onChange={set("maritalStatus")}>
-            {Object.entries(MARITAL_STATUS_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </Select>
-        </Field>
+          <Field label="Mother tongue">
+            <Input
+              maxLength={40}
+              placeholder="e.g. Hindi, Punjabi, Bengali"
+              value={state.motherTongue}
+              onChange={set("motherTongue")}
+            />
+          </Field>
 
-        <Field label="Height">
-          <Select value={state.heightCm} onChange={set("heightCm")}>
-            <option value="">Prefer not to say</option>
-            {HEIGHTS_CM.map((cm) => (
-              <option key={cm} value={cm}>
-                {formatHeight(cm)} ({cm} cm)
-              </option>
-            ))}
-          </Select>
-        </Field>
+          <Field label="Current city">
+            <Input
+              required
+              minLength={2}
+              maxLength={60}
+              placeholder="e.g. Bengaluru, Mumbai, Pune"
+              value={state.city}
+              onChange={set("city")}
+            />
+          </Field>
 
-        <Field label="Profile managed by">
-          <Select value={state.managedBy} onChange={set("managedBy")}>
-            {Object.entries(MANAGED_BY_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </Select>
-        </Field>
-
-        <Field label="Religion">
-          <Select value={state.religion} onChange={set("religion")}>
-            {RELIGIONS_LIST.map((religion) => (
-              <option key={religion} value={religion}>
-                {religion}
-              </option>
-            ))}
-          </Select>
-        </Field>
+          <Field label="State / Region">
+            <Input
+              maxLength={60}
+              placeholder="e.g. Karnataka, Maharashtra"
+              value={state.state}
+              onChange={set("state")}
+            />
+          </Field>
+        </div>
       </div>
 
-      {/* Community & Location */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <Field label="Community / Caste (Optional)">
-          <Input
-            placeholder="e.g. Agarwal, Brahmin, Khatri"
-            list="community-options"
-            maxLength={60}
-            value={state.community}
-            onChange={set("community")}
-          />
-          <datalist id="community-options">
-            {COMMUNITIES_LIST.map((c) => (
-              <option key={c} value={c} />
-            ))}
-          </datalist>
-        </Field>
+      {/* Step 3: Education & Career */}
+      <div className="space-y-4 pt-2">
+        <div className="flex items-center gap-2.5 pb-2 border-b border-border">
+          <span className="size-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center">
+            {ONBOARDING_STEPS[2].id}
+          </span>
+          <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">
+            {ONBOARDING_STEPS[2].label} · {ONBOARDING_STEPS[2].sublabel}
+          </h2>
+        </div>
 
-        <Field label="Mother tongue">
-          <Input
-            maxLength={40}
-            placeholder="e.g. Hindi, Punjabi, Bengali"
-            value={state.motherTongue}
-            onChange={set("motherTongue")}
-          />
-        </Field>
+        <div className="grid md:grid-cols-2 gap-4">
+          <Field label="Highest education">
+            <Input
+              maxLength={120}
+              placeholder="e.g. B.Tech (IIT), MBA (IIM)"
+              list="education-options"
+              value={state.education}
+              onChange={set("education")}
+            />
+            <datalist id="education-options">
+              {EDUCATION_LIST.map((edu) => (
+                <option key={edu} value={edu} />
+              ))}
+            </datalist>
+          </Field>
 
-        <Field label="Current city">
-          <Input
-            required
-            minLength={2}
-            maxLength={60}
-            placeholder="e.g. Bengaluru, Mumbai, Pune"
-            value={state.city}
-            onChange={set("city")}
-          />
-        </Field>
-
-        <Field label="State / Region">
-          <Input
-            maxLength={60}
-            placeholder="e.g. Karnataka, Maharashtra"
-            value={state.state}
-            onChange={set("state")}
-          />
-        </Field>
+          <Field label="Profession / Occupation">
+            <Input
+              maxLength={120}
+              placeholder="e.g. Software Engineer, Doctor, CA"
+              value={state.profession}
+              onChange={set("profession")}
+            />
+          </Field>
+        </div>
       </div>
 
-      {/* Education & Career */}
-      <div className="grid md:grid-cols-2 gap-4">
-        <Field label="Highest education">
-          <Input
-            maxLength={120}
-            placeholder="e.g. B.Tech (IIT), MBA (IIM)"
-            list="education-options"
-            value={state.education}
-            onChange={set("education")}
-          />
-          <datalist id="education-options">
-            {EDUCATION_LIST.map((edu) => (
-              <option key={edu} value={edu} />
-            ))}
-          </datalist>
-        </Field>
+      {/* Step 4: Family & Personal Note */}
+      <div className="space-y-4 pt-2">
+        <div className="flex items-center gap-2.5 pb-2 border-b border-border">
+          <span className="size-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center">
+            {ONBOARDING_STEPS[3].id}
+          </span>
+          <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">
+            {ONBOARDING_STEPS[3].label} · {ONBOARDING_STEPS[3].sublabel}
+          </h2>
+        </div>
 
-        <Field label="Profession / Occupation">
-          <Input
-            maxLength={120}
-            placeholder="e.g. Software Engineer, Doctor, CA"
-            value={state.profession}
-            onChange={set("profession")}
+        <Field
+          label="About you"
+          hint="A few thoughtful lines about your values, lifestyle, and family background."
+        >
+          <Textarea
+            rows={4}
+            maxLength={1000}
+            placeholder="Share a little about who you are, what brings you joy, and what you seek in a life partner..."
+            value={state.about}
+            onChange={set("about")}
           />
         </Field>
       </div>
 
-      {/* About Section */}
-      <Field
-        label="About you"
-        hint="A few thoughtful lines about your values, lifestyle, and family background."
-      >
-        <Textarea
-          rows={4}
-          maxLength={1000}
-          placeholder="Share a little about who you are, what brings you joy, and what you seek in a life partner..."
-          value={state.about}
-          onChange={set("about")}
-        />
-      </Field>
+      {/* Step 5: Partner Preferences */}
+      <div className="space-y-4 pt-2">
+        <div className="flex items-center gap-2.5 pb-2 border-b border-border">
+          <span className="size-6 rounded-full bg-primary/10 text-primary text-xs font-bold flex items-center justify-center">
+            {ONBOARDING_STEPS[4].id}
+          </span>
+          <h2 className="text-sm font-bold uppercase tracking-wider text-foreground">
+            {ONBOARDING_STEPS[4].label} · {ONBOARDING_STEPS[4].sublabel}
+          </h2>
+        </div>
 
-      {/* Partner Preferences */}
-      <div className="border-t border-border pt-6">
-        <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-3">
-          Partner Age Preference
-        </p>
         <div className="grid grid-cols-2 gap-4">
-          <Field label="Age from">
+          <Field label="Partner age from">
             <Input
               type="number"
               min={18}
               max={80}
-              placeholder="18"
+              placeholder="22"
               value={state.partnerAgeMin}
               onChange={set("partnerAgeMin")}
             />
           </Field>
-          <Field label="Age to">
+          <Field label="Partner age to">
             <Input
               type="number"
               min={18}
               max={80}
-              placeholder="80"
+              placeholder="32"
               value={state.partnerAgeMax}
               onChange={set("partnerAgeMax")}
             />

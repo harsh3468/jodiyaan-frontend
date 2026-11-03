@@ -1,7 +1,14 @@
 import Image from "next/image";
 import Link from "next/link";
-import { BadgeCheck, Loader2 } from "lucide-react";
 import type { ComponentProps } from "react";
+import {
+  BadgeCheck,
+  HeartHandshake,
+  Loader2,
+  Lock,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 import { initials } from "@/lib/format";
 
 const cx = (...classes: (string | false | null | undefined)[]) =>
@@ -69,6 +76,27 @@ export function VerifiedBadge({
       <BadgeCheck className="size-4 shrink-0 fill-tertiary/20" />
     </span>
   );
+}
+
+export function PillarIcon({
+  name,
+  className = "size-8 text-tertiary",
+}: {
+  name: string;
+  className?: string;
+}) {
+  switch (name) {
+    case "shield-check":
+      return <ShieldCheck className={className} />;
+    case "heart-handshake":
+      return <HeartHandshake className={className} />;
+    case "sparkles":
+      return <Sparkles className={className} />;
+    case "lock":
+      return <Lock className={className} />;
+    default:
+      return <ShieldCheck className={className} />;
+  }
 }
 
 const BUTTON_VARIANTS = {

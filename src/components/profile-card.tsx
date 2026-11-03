@@ -9,21 +9,33 @@ export function ProfileCard({ profile }: { profile: ProfileCardData }) {
   const firstName = profile.fullName.split(" ")[0];
 
   return (
-    <article className="group overflow-hidden rounded-xl border border-border bg-card shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
-      <Link href={`/profiles/${profile.userId}`} className="block relative">
-        <div className="relative aspect-[4/5] bg-accent/60 flex items-center justify-center overflow-hidden">
+    <article className="group overflow-hidden rounded-2xl border border-border bg-card shadow-sm hover:shadow-md hover:border-primary/40 transition-all flex flex-col justify-between">
+      <div className="relative aspect-[4/5] bg-accent/60 overflow-hidden">
+        <Link
+          href={`/profiles/${profile.userId}`}
+          className="block size-full relative focus:outline-none"
+        >
           <Avatar
             name={profile.fullName}
             photoUrl={profile.photoUrl}
-            className="size-full text-6xl"
+            className="size-full text-6xl group-hover:scale-105 transition-transform duration-500"
           />
-          {active && (
-            <span className="absolute left-3 top-3 rounded-full bg-card/90 backdrop-blur px-2.5 py-1 text-xs font-semibold text-emerald-800 border border-border/50">
-              ● {active}
-            </span>
-          )}
-        </div>
-      </Link>
+        </Link>
+
+        {active && (
+          <span className="absolute left-3 top-3 rounded-full bg-card/90 backdrop-blur-md px-2.5 py-1 text-xs font-semibold text-emerald-800 border border-border/50 shadow-sm pointer-events-none">
+            ● {active}
+          </span>
+        )}
+
+        <button
+          type="button"
+          aria-label="Save profile"
+          className="absolute top-3 right-3 size-9 rounded-full bg-card/90 backdrop-blur-md shadow-md flex items-center justify-center text-primary/80 hover:text-primary hover:scale-110 active:scale-95 transition-all border border-border/50"
+        >
+          <Heart className="size-4.5" />
+        </button>
+      </div>
 
       <div className="p-4 flex-1 flex flex-col justify-between">
         <div>
@@ -32,13 +44,6 @@ export function ProfileCard({ profile }: { profile: ProfileCardData }) {
               <span>{firstName}, {profile.age}</span>
               <VerifiedBadge />
             </h2>
-            <button
-              type="button"
-              aria-label="Save profile"
-              className="text-primary/70 hover:text-primary transition-colors shrink-0 p-1"
-            >
-              <Heart className="size-5" />
-            </button>
           </div>
 
           <p className="text-xs mt-1.5 text-muted-foreground font-medium truncate">
@@ -52,9 +57,9 @@ export function ProfileCard({ profile }: { profile: ProfileCardData }) {
 
         <Link
           href={`/profiles/${profile.userId}`}
-          className="mt-4 min-h-10 w-full rounded-lg border border-primary text-primary font-semibold text-sm flex items-center justify-center hover:bg-primary hover:text-primary-foreground transition-all"
+          className="mt-4 min-h-10 w-full rounded-lg bg-primary text-primary-foreground font-semibold text-sm flex items-center justify-center gap-1.5 hover:opacity-95 shadow-sm transition-all"
         >
-          View profile
+          Express Interest
         </Link>
       </div>
     </article>

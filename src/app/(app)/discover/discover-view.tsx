@@ -14,10 +14,13 @@ import {
 } from "@/components/ui";
 import { api, ApiError } from "@/lib/api";
 import {
+  COMMUNITIES_LIST,
   DISCOVER_PAGE_SIZE,
+  EDUCATION_LIST,
   EMPTY_DISCOVER_FILTERS,
   MATCH_FILTER_TABS,
   RELIGIONS_LIST,
+  SAMPLE_PROFILES,
   TOP_INDIAN_CITIES,
 } from "@/lib/constants";
 import type {
@@ -73,7 +76,9 @@ export function DiscoverView() {
     }
   }
 
-  const items = [...(first.data?.items ?? []), ...more];
+  const apiItems = [...(first.data?.items ?? []), ...more];
+  // If backend returns 0 items and no filters are applied, fallback to showcase sample profiles
+  const items = apiItems.length > 0 ? apiItems : Object.values(filters).some(Boolean) ? [] : SAMPLE_PROFILES;
   const canLoadMore = hasMore ?? first.data?.hasMore ?? false;
   const filtered = Object.values(filters).some(Boolean);
 
@@ -106,7 +111,7 @@ export function DiscoverView() {
           <div className="relative">
             <button
               type="button"
-              className="min-h-11 px-4 rounded-lg border border-border bg-card text-foreground font-semibold text-sm flex items-center gap-2 hover:bg-secondary/40"
+              className="min-h-11 px-4 rounded-lg border border-border bg-card text-foreground font-semibold text-sm flex items-center gap-2 hover:bg-secondary/40 transition-colors"
             >
               <span>Sort: Most relevant</span>
               <ChevronDown className="size-4 text-muted-foreground" />
@@ -116,10 +121,10 @@ export function DiscoverView() {
       </div>
 
       {/* Main Grid: Sidebar + Matches */}
-      <div className="mt-8 grid lg:grid-cols-[260px_1fr] gap-8 items-start">
+      <div className="mt-8 grid lg:grid-cols-[280px_1fr] gap-8 items-start">
         {/* Desktop Filter Sidebar */}
         <aside
-          className={`bg-card rounded-xl border border-border p-5 shadow-sm ${
+          className={`bg-card rounded-2xl border border-border p-5 shadow-sm ${
             showMobileFilters
               ? "fixed inset-x-4 top-24 z-30 max-h-[80vh] overflow-y-auto block lg:relative lg:inset-auto lg:top-auto lg:max-h-none"
               : "hidden lg:block"
@@ -158,31 +163,33 @@ export function DiscoverView() {
             }}
             className="mt-4 space-y-4"
           >
-            <Field label="Age from">
-              <Input
-                type="number"
-                min={18}
-                max={80}
-                placeholder="18"
-                value={draft.ageMin}
-                onChange={(e) =>
-                  setDraft({ ...draft, ageMin: e.target.value })
-                }
-              />
-            </Field>
+            <div className="grid grid-cols-2 gap-2">
+              <Field label="Age from">
+                <Input
+                  type="number"
+                  min={18}
+                  max={80}
+                  placeholder="22"
+                  value={draft.ageMin}
+                  onChange={(e) =>
+                    setDraft({ ...draft, ageMin: e.target.value })
+                  }
+                />
+              </Field>
 
-            <Field label="Age to">
-              <Input
-                type="number"
-                min={18}
-                max={80}
-                placeholder="80"
-                value={draft.ageMax}
-                onChange={(e) =>
-                  setDraft({ ...draft, ageMax: e.target.value })
-                }
-              />
-            </Field>
+              <Field label="Age to">
+                <Input
+                  type="number"
+                  min={18}
+                  max={80}
+                  placeholder="32"
+                  value={draft.ageMax}
+                  onChange={(e) =>
+                    setDraft({ ...draft, ageMax: e.target.value })
+                  }
+                />
+              </Field>
+            </div>
 
             <Field label="Location">
               <Select
@@ -214,7 +221,66 @@ export function DiscoverView() {
               </Select>
             </Field>
 
-            <div className="pt-2">
+            <Field label="Community">
+              <Select
+                value={draft.community ?? ""}
+                onChange={(e) =>
+                  setDraft({ ...draft, community: e.target.value })
+                }
+              >
+                <option value="">Any community</option>
+                {COMMUNITIES_LIST.map((c) => (
+                  <option key={c} value={c}>
+                    {c}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+
+            <Field label="Education">
+              <Select
+                value={draft.education ?? ""}
+                onChange={(e) =>
+                  setDraft({ ...draft, education: e.target.value })
+                }
+              >
+                <option value="">Any education</option>
+                {EDUCATION_LIST.map((edu) => (
+                  <option key={edu} value={edu}>
+                    {edu}
+                  </option>
+                ))}
+              </Select>
+            </Field>
+
+            {/* Checkbox Options */}
+            <div className="pt-2 border-t border-border space-y-2.5">
+              <label className="flex items-center gap-2.5 text-xs font-semibold text-foreground cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={Boolean(draft.verifiedOnly)}
+                  onChange={(e) =>
+                    setDraft({ ...draft, verifiedOnly: e.target.checked })
+                  }
+                  className="rounded border-input text-primary focus:ring-primary size-4"
+                />
+                <span>Verified profiles only</span>
+              </label>
+
+              <label className="flex items-center gap-2.5 text-xs font-semibold text-foreground cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={Boolean(draft.withPhoto)}
+                  onChange={(e) =>
+                    setDraft({ ...draft, withPhoto: e.target.checked })
+                  }
+                  className="rounded border-input text-primary focus:ring-primary size-4"
+                />
+                <span>With photo only</span>
+              </label>
+            </div>
+
+            <div className="pt-3">
               <Button type="submit" className="w-full">
                 Apply filters
               </Button>
@@ -233,7 +299,7 @@ export function DiscoverView() {
                   key={tab.id}
                   type="button"
                   onClick={() => setActiveTab(tab.id)}
-                  className={`px-4 py-2 rounded-lg text-sm font-semibold transition-all shrink-0 ${
+                  className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all shrink-0 ${
                     active
                       ? "bg-primary text-primary-foreground shadow-sm"
                       : "bg-card border border-border text-foreground hover:bg-secondary/40"

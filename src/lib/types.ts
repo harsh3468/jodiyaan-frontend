@@ -156,6 +156,23 @@ export interface DiscoverFilters {
   ageMax: string;
   city: string;
   religion: string;
+  community?: string;
+  education?: string;
+  verifiedOnly?: boolean;
+  withPhoto?: boolean;
+}
+
+export interface OnboardingStep {
+  id: number;
+  label: string;
+  sublabel: string;
+}
+
+export interface QuickSearchFilters {
+  lookingFor: "bride" | "groom";
+  ageRange: string;
+  community: string;
+  city: string;
 }
 
 export type InterestTab = "received" | "sent";
