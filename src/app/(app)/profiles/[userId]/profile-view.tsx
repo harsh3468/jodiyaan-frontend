@@ -19,7 +19,7 @@ import {
   VerifiedBadge,
 } from "@/components/ui";
 import { api } from "@/lib/api";
-import { PROFILE_TABS, SAMPLE_PROFILE_DETAILS } from "@/lib/constants";
+import { PROFILE_FACT_LABELS, PROFILE_TABS } from "@/lib/constants";
 import {
   compact,
   formatHeight,
@@ -27,8 +27,8 @@ import {
   MANAGED_BY_LABELS,
   MARITAL_STATUS_LABELS,
 } from "@/lib/format";
-import type { ProfileDetail } from "@/lib/types";
 import { useApi } from "@/lib/use-api";
+import { useIsMounted } from "@/lib/use-mounted";
 import { InterestActions } from "./interest-actions";
 import { SafetyActions } from "./safety-actions";
 
@@ -38,21 +38,18 @@ export function ProfileView() {
   const [activeTab, setActiveTab] = useState<string>("about");
   const [copied, setCopied] = useState(false);
   const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
+  const isMounted = useIsMounted();
 
-  const sampleData: ProfileDetail | null =
-    userId && userId in SAMPLE_PROFILE_DETAILS
-      ? SAMPLE_PROFILE_DETAILS[userId]
+  const { data: profile, error, loading, setData } = useApi(userId, () =>
+    api.profile(userId),
+  );
+  const activeStatus =
+    isMounted && profile?.lastActiveAt
+      ? formatLastActive(profile.lastActiveAt)
       : null;
 
-  const { data: apiProfile, error, loading, setData } = useApi(
-    sampleData ? null : userId,
-    () => (sampleData ? Promise.resolve(sampleData) : api.profile(userId)),
-  );
-
-  const profile = sampleData ?? apiProfile;
-
   if (loading && !profile) return <PageLoader />;
-  if ((error || !profile) && !sampleData) {
+  if (error || !profile) {
     return (
       <div className="space-y-4">
         <Notice tone="error">{error ?? "Profile not found."}</Notice>
@@ -65,8 +62,6 @@ export function ProfileView() {
       </div>
     );
   }
-
-  if (!profile) return null;
 
   const isOwn = user?.id === profile.userId;
   const firstName = profile.fullName.split(" ")[0];
@@ -87,6 +82,7 @@ export function ProfileView() {
     ["Mother tongue", profile.motherTongue],
     ["Education", profile.education],
     ["Profession", profile.profession],
+    [PROFILE_FACT_LABELS.salary, profile.annualIncome ?? null],
     ["Lives in", compact(profile.city, profile.state, profile.country)],
     ["Profile created by", MANAGED_BY_LABELS[profile.managedBy]],
   ];
@@ -152,9 +148,9 @@ export function ProfileView() {
                 className="size-full text-8xl"
               />
             )}
-            {formatLastActive(profile.lastActiveAt) && (
+            {activeStatus && (
               <span className="absolute left-3 top-3 rounded-full bg-card/90 backdrop-blur-md px-2.5 py-1 text-xs font-semibold text-emerald-800 border border-border/50 shadow-sm">
-                ● {formatLastActive(profile.lastActiveAt)}
+                ● {activeStatus}
               </span>
             )}
           </div>

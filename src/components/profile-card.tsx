@@ -1,11 +1,16 @@
+"use client";
+
 import Link from "next/link";
 import { GraduationCap, Heart, Ruler } from "lucide-react";
 import { formatHeight, formatLastActive } from "@/lib/format";
 import type { ProfileCard as ProfileCardData } from "@/lib/types";
+import { useIsMounted } from "@/lib/use-mounted";
 import { Avatar, VerifiedBadge } from "./ui";
 
 export function ProfileCard({ profile }: { profile: ProfileCardData }) {
-  const active = formatLastActive(profile.lastActiveAt);
+  const isMounted = useIsMounted();
+  const active = isMounted ? formatLastActive(profile.lastActiveAt) : null;
+
   const firstName = profile.fullName.split(" ")[0];
   const lastInitial = profile.fullName.split(" ")[1]?.charAt(0);
   const displayName = lastInitial ? `${firstName} ${lastInitial}.` : firstName;

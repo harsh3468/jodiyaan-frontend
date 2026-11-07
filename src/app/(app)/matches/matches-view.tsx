@@ -13,10 +13,13 @@ import {
 import { api } from "@/lib/api";
 import { formatTime } from "@/lib/format";
 import { useApi } from "@/lib/use-api";
+import { useIsMounted } from "@/lib/use-mounted";
 
 export function MatchesView() {
+  const isMounted = useIsMounted();
   const { user } = useAuth();
   const { data, error, loading } = useApi("matches", api.matches);
+  const matches = data ?? [];
 
   return (
     <>
@@ -24,10 +27,10 @@ export function MatchesView() {
         title="Messages"
         subtitle="Meaningful conversations with mutual matches."
       />
-      {error && <Notice tone="error">{error}</Notice>}
-      {loading ? (
+      {error && !matches.length && <Notice tone="error">{error}</Notice>}
+      {loading && !matches.length ? (
         <PageLoader />
-      ) : !data?.length ? (
+      ) : !matches.length ? (
         <EmptyState title="No messages yet">
           When someone accepts your interest, or you accept theirs, you can chat
           here.{" "}
@@ -37,7 +40,7 @@ export function MatchesView() {
         </EmptyState>
       ) : (
         <ul className="divide-y divide-border overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-          {data.map((match) => {
+          {matches.map((match) => {
             const name = match.profile?.fullName ?? "Member";
             const preview = match.lastMessage
               ? `${match.lastMessage.senderId === user?.id ? "You: " : ""}${match.lastMessage.body}`
@@ -60,9 +63,11 @@ export function MatchesView() {
                         <VerifiedBadge />
                       </p>
                       <span className="shrink-0 text-xs text-muted-foreground">
-                        {formatTime(
-                          match.lastMessage?.createdAt ?? match.matchedAt,
-                        )}
+                        {isMounted
+                          ? formatTime(
+                              match.lastMessage?.createdAt ?? match.matchedAt,
+                            )
+                          : null}
                       </span>
                     </div>
                     <p

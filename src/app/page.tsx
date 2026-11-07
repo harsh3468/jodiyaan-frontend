@@ -3,11 +3,16 @@ import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { JourneyStartCard } from "@/components/journey-start-card";
 import { RedirectIfSignedIn } from "@/components/redirect-if-signed-in";
+import { SiteFooter } from "@/components/site-footer";
 import { ButtonLink, Wordmark } from "@/components/ui";
 import {
+  ABOUT_CONTENT,
   APPROACH_CONTENT,
   HERO_CONTENT,
   LANDING_NAV_ITEMS,
+  MEMBERSHIP_BANNER,
+  STORIES_SECTION,
+  SUCCESS_STORIES,
 } from "@/lib/constants";
 
 export default function Home() {
@@ -141,28 +146,86 @@ export default function Home() {
             </div>
           </div>
         </section>
+
+        <section id="stories" className="scroll-mt-24 border-t border-border/60 bg-background px-6 py-16 lg:px-16 lg:py-24">
+          <div className="mx-auto max-w-6xl">
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-tertiary">
+              {STORIES_SECTION.badge}
+            </p>
+            <h2 className="mt-3 max-w-xl font-heading text-3xl font-bold text-foreground sm:text-4xl">
+              {STORIES_SECTION.title}
+            </h2>
+            <p className="mt-3 max-w-2xl text-sm text-muted-foreground">
+              {STORIES_SECTION.subtitle}
+            </p>
+            <div className="mt-10 grid gap-5 md:grid-cols-3">
+              {SUCCESS_STORIES.map((story) => (
+                <article
+                  key={story.names}
+                  className="rounded-2xl border border-border bg-card p-6 shadow-sm"
+                >
+                  <p className="text-sm leading-relaxed text-foreground/80">
+                    “{story.quote}”
+                  </p>
+                  <p className="mt-5 font-heading text-sm font-bold text-primary">
+                    {story.names}
+                  </p>
+                  <p className="text-xs text-muted-foreground">{story.place}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section id="membership" className="scroll-mt-24 bg-primary px-6 py-16 text-primary-foreground lg:px-16">
+          <div className="mx-auto flex max-w-6xl flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-xs font-bold uppercase tracking-[0.25em] text-tertiary">
+                {MEMBERSHIP_BANNER.badge}
+              </p>
+              <h2 className="mt-3 font-heading text-3xl font-bold text-primary-foreground sm:text-4xl">
+                {MEMBERSHIP_BANNER.title}
+              </h2>
+              <p className="mt-4 text-base leading-relaxed text-primary-foreground/80">
+                {MEMBERSHIP_BANNER.description}
+              </p>
+              <ul className="mt-6 flex flex-wrap gap-2">
+                {MEMBERSHIP_BANNER.points.map((point) => (
+                  <li
+                    key={point}
+                    className="rounded-full bg-primary-foreground/10 px-3 py-1 text-xs font-semibold"
+                  >
+                    {point}
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <ButtonLink
+              href={MEMBERSHIP_BANNER.href}
+              variant="tertiary"
+              className="shrink-0 rounded-full px-7"
+            >
+              {MEMBERSHIP_BANNER.cta}
+            </ButtonLink>
+          </div>
+        </section>
+
+        <section id="about" className="scroll-mt-24 border-t border-border/60 bg-[#FFFBF6] px-6 py-16 lg:px-16 lg:py-24">
+          <div className="mx-auto max-w-3xl">
+            <p className="text-xs font-bold uppercase tracking-[0.25em] text-tertiary">
+              {ABOUT_CONTENT.badge}
+            </p>
+            <h2 className="mt-3 font-heading text-3xl font-bold text-primary sm:text-4xl">
+              {ABOUT_CONTENT.title}
+            </h2>
+            <p className="mt-4 text-base leading-relaxed text-muted-foreground sm:text-lg">
+              {ABOUT_CONTENT.description}
+            </p>
+          </div>
+        </section>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-border/60 bg-card px-6 lg:px-16 py-10">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
-          <Wordmark size="sm" />
-          <p className="text-xs text-muted-foreground text-center">
-            Jodiyaan · Modern Indian Matrimonial · Sachi jodiyaan, sache log.
-          </p>
-          <div className="flex gap-6 text-xs text-muted-foreground">
-            <Link href="/#about" className="hover:text-primary transition-colors">
-              Privacy Policy
-            </Link>
-            <Link href="/#about" className="hover:text-primary transition-colors">
-              Terms of Service
-            </Link>
-            <Link href="/#about" className="hover:text-primary transition-colors">
-              Contact
-            </Link>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

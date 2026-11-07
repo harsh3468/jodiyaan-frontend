@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { ComponentProps } from "react";
 import {
   BadgeCheck,
+  ChevronDown,
   HeartHandshake,
   Loader2,
   Lock,
@@ -183,8 +184,25 @@ export function Input(props: ComponentProps<"input">) {
   return <input {...props} className={cx(inputClass, props.className)} />;
 }
 
-export function Select(props: ComponentProps<"select">) {
-  return <select {...props} className={cx(inputClass, props.className)} />;
+export function Select({
+  className,
+  children,
+  ...props
+}: ComponentProps<"select">) {
+  return (
+    <div className="relative w-full">
+      <select
+        {...props}
+        className={cx(
+          "w-full appearance-none rounded-xl border border-border bg-card px-3.5 pr-10 py-2.5 text-sm font-medium text-foreground outline-none transition-all hover:border-primary/50 focus:border-primary focus:ring-2 focus:ring-primary/20 cursor-pointer shadow-2xs",
+          className,
+        )}
+      >
+        {children}
+      </select>
+      <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+    </div>
+  );
 }
 
 export function Textarea(props: ComponentProps<"textarea">) {

@@ -34,11 +34,19 @@ export interface ProfileCard {
   heightCm: number | null;
   maritalStatus: MaritalStatus;
   religion: string | null;
+  community?: string | null;
   motherTongue: string | null;
   city: string;
   state: string | null;
   education: string | null;
   profession: string | null;
+  annualIncome?: string | null;
+  about?: string | null;
+  managedBy?: ManagedBy;
+  country?: string | null;
+  gender?: Gender;
+  partnerAgeMin?: number | null;
+  partnerAgeMax?: number | null;
   photoUrl: string | null;
   lastActiveAt: string | null;
 }
@@ -78,6 +86,7 @@ export interface ProfileInput {
   state?: string;
   education?: string;
   profession?: string;
+  annualIncome?: string;
   about?: string;
   managedBy?: ManagedBy;
   partnerAgeMin?: number;
@@ -140,6 +149,7 @@ export interface ProfileFormState {
   state: string;
   education: string;
   profession: string;
+  annualIncome: string;
   about: string;
   partnerAgeMin: string;
   partnerAgeMax: string;
@@ -158,8 +168,6 @@ export interface DiscoverFilters {
   religion: string;
   community?: string;
   education?: string;
-  verifiedOnly?: boolean;
-  withPhoto?: boolean;
 }
 
 export interface OnboardingStep {
@@ -188,3 +196,43 @@ export interface ProfileForOption {
 }
 
 export type InterestTab = "received" | "sent";
+
+export interface StoryCard {
+  names: string;
+  place: string;
+  quote: string;
+}
+
+export interface FooterLink {
+  href: string;
+  label: string;
+}
+
+export interface FooterColumn {
+  title: string;
+  links: FooterLink[];
+}
+
+export interface ProfileFact {
+  label: string;
+  value: string;
+}
+
+export interface InterestSwipeDeckProps {
+  interests: InterestView[];
+  onAccept: (interest: InterestView) => void;
+  onDecline: (interest: InterestView) => void;
+}
+
+export interface SwipeCardProps {
+  interest: InterestView;
+  onAccept: (interest: InterestView) => void;
+  onDecline: (interest: InterestView) => void;
+}
+
+export interface InterestListProps {
+  interests: InterestView[];
+  tab: InterestTab;
+  busyId: string | null;
+  onWithdraw: (interest: InterestView) => void;
+}

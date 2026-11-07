@@ -1,5 +1,7 @@
+import { Suspense } from "react";
 import { AppShell } from "@/components/app-shell";
 import { AuthGuard } from "@/components/auth-guard";
+import { PageLoader } from "@/components/ui";
 
 export default function AppLayout({
   children,
@@ -8,7 +10,9 @@ export default function AppLayout({
 }) {
   return (
     <AuthGuard>
-      <AppShell>{children}</AppShell>
+      <Suspense fallback={<PageLoader />}>
+        <AppShell>{children}</AppShell>
+      </Suspense>
     </AuthGuard>
   );
 }

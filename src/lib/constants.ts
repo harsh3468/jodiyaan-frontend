@@ -1,9 +1,9 @@
 import type {
   DiscoverFilters,
+  FooterColumn,
   OnboardingStep,
-  ProfileCard,
-  ProfileDetail,
   ProfileForOption,
+  StoryCard,
 } from "./types";
 
 export const APP_NAME = "Jodiyaan";
@@ -55,6 +55,89 @@ export const LANDING_NAV_ITEMS = [
   { href: "/#stories", label: "Success Stories" },
   { href: "/#membership", label: "Membership" },
   { href: "/#about", label: "About" },
+] as const;
+
+export const ABOUT_CONTENT = {
+  badge: "About",
+  title: "Made for families who still believe in introductions",
+  description:
+    "Jodiyaan is a matrimonial for people who want a serious conversation, not a swipe. You create an account with an email code, share what matters, and chat only after both sides accept an interest.",
+} as const;
+
+export const STORIES_SECTION = {
+  badge: "Success stories",
+  title: "Conversations that became introductions",
+  subtitle:
+    "Sample stories that show the pace we want: a match, a careful chat, then the families.",
+} as const;
+
+export const SUCCESS_STORIES: StoryCard[] = [
+  {
+    names: "Meera & Kabir",
+    place: "Pune",
+    quote:
+      "We wrote for two weeks before our families met. The slow start made the first visit feel easy.",
+  },
+  {
+    names: "Ananya & Rohan",
+    place: "Bengaluru",
+    quote:
+      "Same city, same values, and a conversation that began with work and ended with Sunday lunch plans.",
+  },
+  {
+    names: "Sana & Imran",
+    place: "Hyderabad",
+    quote:
+      "Our parents sent the interest. We took the chat from there, and both families stayed in the loop.",
+  },
+];
+
+export const MEMBERSHIP_BANNER = {
+  badge: "Membership",
+  title: "Create an account. Chat only after you both say yes.",
+  description:
+    "Sign-in is a one-time email code. The first account creates your profile, and messages open only on a mutual match.",
+  cta: "Create your account",
+  href: "/login?intent=onboarding",
+  points: ["Email code, no password", "Interest before chat", "You choose who can see you"],
+} as const;
+
+export const FOOTER_NOTE =
+  "Jodiyaan · Modern Indian matrimonial · Sachi jodiyaan, sache log.";
+
+export const FOOTER_COLUMNS: FooterColumn[] = [
+  {
+    title: "Start",
+    links: [
+      { href: "/login?intent=onboarding", label: "Create account" },
+      { href: "/login", label: "Log in" },
+      { href: "/discover", label: "Find matches" },
+    ],
+  },
+  {
+    title: "Learn",
+    links: [
+      { href: "/#stories", label: "Success stories" },
+      { href: "/#membership", label: "Membership" },
+      { href: "/#about", label: "About" },
+    ],
+  },
+];
+
+export const CHAT_SAFETY_NOTE =
+  "For your safety, never send money or share bank, OTP, or identity details in chat.";
+
+export const CHAT_COMPOSER_HINT = "Enter to send. Shift+Enter for a new line.";
+
+export const CHAT_STATUS = {
+  seen: "Seen",
+  sent: "Sent",
+} as const;
+
+export const CHAT_STARTERS = [
+  "Namaste! Glad we matched.",
+  "What does a relaxed Sunday look like for you?",
+  "What matters most to you in a partner?",
 ] as const;
 
 export const APP_NAV_ITEMS = [
@@ -168,6 +251,17 @@ export const HEIGHTS_CM = Array.from({ length: 31 }, (_, i) =>
   Math.round((54 + i) * 2.54),
 );
 
+export const ANNUAL_INCOME_OPTIONS = [
+  "Under ₹5 LPA",
+  "₹5–10 LPA",
+  "₹10–15 LPA",
+  "₹15–20 LPA",
+  "₹20–30 LPA",
+  "₹30–50 LPA",
+  "₹50–75 LPA",
+  "₹75 LPA and above",
+] as const;
+
 export const PROFILE_TEXT_FIELDS = [
   "fullName",
   "religion",
@@ -177,6 +271,7 @@ export const PROFILE_TEXT_FIELDS = [
   "state",
   "education",
   "profession",
+  "annualIncome",
   "about",
 ] as const;
 
@@ -187,13 +282,53 @@ export const EMPTY_DISCOVER_FILTERS: DiscoverFilters = {
   religion: "",
   community: "",
   education: "",
-  verifiedOnly: false,
-  withPhoto: false,
 };
 
 export const DISCOVER_PAGE_SIZE = 12;
 
 export const PHOTO_MAX_MB = 5;
+
+export const PROFILE_FACT_LABELS = {
+  profession: "Profession",
+  salary: "Salary",
+  education: "Education",
+  caste: "Caste",
+  religion: "Religion",
+  motherTongue: "Mother tongue",
+  maritalStatus: "Marital status",
+  height: "Height",
+  livesIn: "Lives in",
+  gender: "Gender",
+  managedBy: "Profile for",
+  lookingFor: "Looking for",
+} as const;
+
+export const SWIPE_ACCEPT_PX = 110;
+
+export const INTERESTS_COPY = {
+  title: "Interests",
+  subtitle: "People who want to begin a conversation with you.",
+  received: "Received",
+  sent: "Sent",
+  emptyReceivedTitle: "No new interests yet",
+  emptyReceivedBody:
+    "When someone likes your profile, their card will appear here.",
+  emptySentTitle: "You haven’t sent any",
+  emptySentLink: "Find someone on Discover",
+  swipeHint: "Swipe the photo right to accept, left to pass.",
+  accept: "Accept",
+  pass: "Pass",
+  caughtUp: "You’ve seen every new interest.",
+  theyWrote: "They wrote",
+  about: "About",
+  fullProfile: "Full profile",
+  accepted: "Accepted",
+  sendMessage: "Send message",
+  viewProfile: "View profile",
+  withdraw: "Withdraw",
+  queueOne: "1 new interest",
+  queueMany: "new interests",
+} as const;
 
 export const SENT_STATUS_CONFIG = {
   pending: { label: "Awaiting reply", tone: "bg-secondary text-primary font-semibold" },
@@ -212,126 +347,3 @@ export const ONBOARDING_STEPS: OnboardingStep[] = [
   { id: 4, label: "Family", sublabel: "Traditions" },
   { id: 5, label: "Preferences", sublabel: "Partner" },
 ];
-
-export const SAMPLE_PROFILES: ProfileCard[] = [
-  {
-    userId: "sample-ishita",
-    fullName: "Ishita Gupta",
-    age: 27,
-    heightCm: 163,
-    maritalStatus: "never_married",
-    religion: "Hindu",
-    motherTongue: "Hindi",
-    city: "Bengaluru",
-    state: "Karnataka",
-    education: "MBA",
-    profession: "Product Manager",
-    photoUrl: "/images/profiles/ishita.jpg",
-    lastActiveAt: new Date().toISOString(),
-  },
-  {
-    userId: "sample-aarav",
-    fullName: "Aarav Sharma",
-    age: 29,
-    heightCm: 178,
-    maritalStatus: "never_married",
-    religion: "Hindu",
-    motherTongue: "Hindi",
-    city: "Bengaluru",
-    state: "Karnataka",
-    education: "B.Tech",
-    profession: "Software Engineer",
-    photoUrl: "/images/profiles/aarav.jpg",
-    lastActiveAt: new Date().toISOString(),
-  },
-  {
-    userId: "sample-riya",
-    fullName: "Riya Mehta",
-    age: 26,
-    heightCm: 160,
-    maritalStatus: "never_married",
-    religion: "Hindu",
-    motherTongue: "Gujarati",
-    city: "Mumbai",
-    state: "Maharashtra",
-    education: "MBA",
-    profession: "Consultant",
-    photoUrl: "/images/profiles/riya.jpg",
-    lastActiveAt: new Date().toISOString(),
-  },
-];
-
-export const SAMPLE_PROFILE_DETAILS: Record<string, ProfileDetail> = {
-  "sample-ishita": {
-    userId: "sample-ishita",
-    fullName: "Ishita Gupta",
-    age: 27,
-    heightCm: 163,
-    maritalStatus: "never_married",
-    religion: "Hindu",
-    community: "Brahmin",
-    motherTongue: "Hindi",
-    city: "Bengaluru",
-    state: "Karnataka",
-    country: "India",
-    education: "MBA (IIM Bangalore)",
-    profession: "Product Manager",
-    photoUrl: "/images/profiles/ishita.jpg",
-    lastActiveAt: new Date().toISOString(),
-    gender: "female",
-    about:
-      "Warm, family-oriented, and ambitious. Working as a Senior PM at a fintech leader in Bengaluru. I cherish meaningful conversations over chai, exploring classical Indian arts, weekend hikes, and spending quality time with family. Looking for someone grounded, with shared values, intellectual curiosity, and mutual respect.",
-    managedBy: "self",
-    partnerAgeMin: 27,
-    partnerAgeMax: 32,
-    relationship: null,
-  },
-  "sample-aarav": {
-    userId: "sample-aarav",
-    fullName: "Aarav Sharma",
-    age: 29,
-    heightCm: 178,
-    maritalStatus: "never_married",
-    religion: "Hindu",
-    community: "Brahmin",
-    motherTongue: "Hindi",
-    city: "Bengaluru",
-    state: "Karnataka",
-    country: "India",
-    education: "B.Tech (IIT Bombay)",
-    profession: "Software Engineer",
-    photoUrl: "/images/profiles/aarav.jpg",
-    lastActiveAt: new Date().toISOString(),
-    gender: "male",
-    about:
-      "Software architect who enjoys solving hard engineering challenges and exploring Indian indie music on weekends. Deeply respect family values, open communication, and shared laughter. Seeking a partner who is passionate about her career, values traditions, and is ready to embark on life's journey together.",
-    managedBy: "self",
-    partnerAgeMin: 24,
-    partnerAgeMax: 30,
-    relationship: null,
-  },
-  "sample-riya": {
-    userId: "sample-riya",
-    fullName: "Riya Mehta",
-    age: 26,
-    heightCm: 160,
-    maritalStatus: "never_married",
-    religion: "Hindu",
-    community: "Vaishya",
-    motherTongue: "Gujarati",
-    city: "Mumbai",
-    state: "Maharashtra",
-    country: "India",
-    education: "MBA (NMIMS)",
-    profession: "Management Consultant",
-    photoUrl: "/images/profiles/riya.jpg",
-    lastActiveAt: new Date().toISOString(),
-    gender: "female",
-    about:
-      "Based in South Mumbai, passionate about strategy consulting, classical dance, and travel. Believes a successful marriage is built on mutual respect, strong cultural grounding, and continuous encouragement of each other's dreams.",
-    managedBy: "parent",
-    partnerAgeMin: 26,
-    partnerAgeMax: 32,
-    relationship: null,
-  },
-};

@@ -57,8 +57,8 @@ export function MeView() {
     if (updated) profile.setData(() => updated);
   }
 
-  if (profile.loading) return <PageLoader />;
   const me = profile.data;
+  if (profile.loading && !me) return <PageLoader />;
   if (!me) return <Notice tone="error">{profile.error ?? "Could not load your profile."}</Notice>;
 
   const missing = [

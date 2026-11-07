@@ -9,9 +9,10 @@ import { useApi } from "@/lib/use-api";
 export function EditProfileView() {
   const router = useRouter();
   const { data: profile, error, loading } = useApi("me", api.myProfile);
+  const activeProfile = profile;
 
-  if (loading) return <PageLoader />;
-  if (!profile) return <Notice tone="error">{error ?? "Could not load your profile."}</Notice>;
+  if (loading && !activeProfile) return <PageLoader />;
+  if (!activeProfile) return <Notice tone="error">{error ?? "Could not load your profile."}</Notice>;
 
   return (
     <div className="max-w-3xl">
@@ -21,7 +22,7 @@ export function EditProfileView() {
       />
       <div className="rounded-xl border border-border bg-card p-6 sm:p-8 shadow-sm">
         <ProfileForm
-          profile={profile}
+          profile={activeProfile}
           submitLabel="Save changes"
           onSubmit={async (input) => {
             await api.updateProfile(input);

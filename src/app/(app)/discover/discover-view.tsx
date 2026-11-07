@@ -18,7 +18,6 @@ import {
   EMPTY_DISCOVER_FILTERS,
   MATCH_FILTER_TABS,
   RELIGIONS_LIST,
-  SAMPLE_PROFILES,
   TOP_INDIAN_CITIES,
 } from "@/lib/constants";
 import type {
@@ -74,14 +73,7 @@ export function DiscoverView() {
     }
   }
 
-  const apiItems = [...(first.data?.items ?? []), ...more];
-  // Fallback to showcase sample profiles matching UI kit reference
-  const items =
-    apiItems.length > 0
-      ? apiItems
-      : Object.values(filters).some(Boolean)
-        ? []
-        : SAMPLE_PROFILES;
+  const items = [...(first.data?.items ?? []), ...more];
   const canLoadMore = hasMore ?? first.data?.hasMore ?? false;
   const filtered = Object.values(filters).some(Boolean);
 
@@ -292,33 +284,6 @@ export function DiscoverView() {
               </Select>
             </div>
 
-            {/* Checkboxes */}
-            <div className="pt-2 border-t border-border/70 space-y-2">
-              <label className="flex items-center gap-2 text-xs font-semibold text-foreground cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={Boolean(draft.verifiedOnly)}
-                  onChange={(e) =>
-                    setDraft({ ...draft, verifiedOnly: e.target.checked })
-                  }
-                  className="rounded border-input text-primary focus:ring-primary size-4"
-                />
-                <span>Verified Only</span>
-              </label>
-
-              <label className="flex items-center gap-2 text-xs font-semibold text-foreground cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={Boolean(draft.withPhoto)}
-                  onChange={(e) =>
-                    setDraft({ ...draft, withPhoto: e.target.checked })
-                  }
-                  className="rounded border-input text-primary focus:ring-primary size-4"
-                />
-                <span>With Photo</span>
-              </label>
-            </div>
-
             <div className="pt-2">
               <Button type="submit" className="w-full rounded-xl text-xs py-2.5 min-h-10 cursor-pointer">
                 Apply Filters
@@ -331,7 +296,7 @@ export function DiscoverView() {
         <section className="min-w-0">
           {first.error && <Notice tone="error">{first.error}</Notice>}
 
-          {first.loading ? (
+          {first.loading && !items.length ? (
             <PageLoader />
           ) : items.length === 0 && !first.error ? (
             <EmptyState title="No profiles found">

@@ -6,6 +6,7 @@ import { Button, Field, Input, Notice, Select, Textarea } from "@/components/ui"
 import { ApiError } from "@/lib/api";
 import {
   COMMUNITIES_LIST,
+  ANNUAL_INCOME_OPTIONS,
   EDUCATION_LIST,
   HEIGHTS_CM,
   ONBOARDING_STEPS,
@@ -73,6 +74,7 @@ function initialState(profile?: OwnProfile): ProfileFormState {
     state: profile?.state ?? "",
     education: profile?.education ?? "",
     profession: profile?.profession ?? "",
+    annualIncome: profile?.annualIncome ?? "",
     about: profile?.about ?? "",
     partnerAgeMin: profile?.partnerAgeMin
       ? String(profile.partnerAgeMin)
@@ -339,6 +341,17 @@ export function ProfileForm({
               value={state.profession}
               onChange={set("profession")}
             />
+          </Field>
+
+          <Field label="Annual income" hint="Shown as salary on your profile.">
+            <Select value={state.annualIncome} onChange={set("annualIncome")}>
+              <option value="">Prefer not to say</option>
+              {ANNUAL_INCOME_OPTIONS.map((income) => (
+                <option key={income} value={income}>
+                  {income}
+                </option>
+              ))}
+            </Select>
           </Field>
         </div>
       </div>

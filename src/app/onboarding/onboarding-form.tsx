@@ -12,7 +12,9 @@ export function OnboardingForm() {
   const justCreated = useRef(false);
 
   useEffect(() => {
-    if (user?.hasProfile && !justCreated.current) router.replace("/discover");
+    if (user?.hasProfile && !justCreated.current) {
+      router.replace("/discover");
+    }
   }, [user, router]);
 
   return (

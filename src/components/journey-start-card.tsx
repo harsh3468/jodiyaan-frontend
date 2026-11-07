@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { ArrowRight, Lock } from "lucide-react";
+import { ArrowRight, ChevronDown, Lock } from "lucide-react";
 import {
   JOURNEY_HERO_CONTENT,
   PROFILE_FOR_OPTIONS,
@@ -72,7 +72,7 @@ export function JourneyStartCard() {
             <label className="block text-xs font-bold text-foreground/80 mb-1.5">
               I am looking for a
             </label>
-            <div className="flex rounded-xl bg-secondary/70 p-1 border border-border/50 h-11">
+            <div className="flex rounded-xl bg-secondary/60 p-1 border border-border h-11">
               <button
                 type="button"
                 onClick={() =>
@@ -109,23 +109,26 @@ export function JourneyStartCard() {
             >
               This profile is for
             </label>
-            <select
-              id="profileFor"
-              value={preferences.profileFor}
-              onChange={(e) =>
-                setPreferences((prev) => ({
-                  ...prev,
-                  profileFor: e.target.value as ManagedBy,
-                }))
-              }
-              className="w-full h-11 bg-background border border-input rounded-xl px-3.5 text-sm font-medium text-foreground outline-none focus:border-primary transition-colors cursor-pointer"
-            >
-              {PROFILE_FOR_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                id="profileFor"
+                value={preferences.profileFor}
+                onChange={(e) =>
+                  setPreferences((prev) => ({
+                    ...prev,
+                    profileFor: e.target.value as ManagedBy,
+                  }))
+                }
+                className="w-full h-11 appearance-none bg-card hover:bg-card/90 border border-border hover:border-primary/50 focus:border-primary rounded-xl px-4 pr-10 text-sm font-medium text-foreground outline-none transition-all cursor-pointer shadow-2xs"
+              >
+                {PROFILE_FOR_OPTIONS.map((opt) => (
+                  <option key={opt.value} value={opt.value} className="bg-card text-foreground">
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+            </div>
           </div>
         </div>
 
@@ -138,23 +141,26 @@ export function JourneyStartCard() {
             >
               Preferred Age
             </label>
-            <select
-              id="ageRange"
-              value={preferences.ageRange}
-              onChange={(e) =>
-                setPreferences((prev) => ({
-                  ...prev,
-                  ageRange: e.target.value,
-                }))
-              }
-              className="w-full h-11 bg-background border border-input rounded-xl px-3.5 text-sm font-medium text-foreground outline-none focus:border-primary transition-colors cursor-pointer"
-            >
-              {QUICK_SEARCH_AGE_OPTIONS.map((opt) => (
-                <option key={opt.label} value={`${opt.min}-${opt.max}`}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                id="ageRange"
+                value={preferences.ageRange}
+                onChange={(e) =>
+                  setPreferences((prev) => ({
+                    ...prev,
+                    ageRange: e.target.value,
+                  }))
+                }
+                className="w-full h-11 appearance-none bg-card hover:bg-card/90 border border-border hover:border-primary/50 focus:border-primary rounded-xl px-4 pr-10 text-sm font-medium text-foreground outline-none transition-all cursor-pointer shadow-2xs"
+              >
+                {QUICK_SEARCH_AGE_OPTIONS.map((opt) => (
+                  <option key={opt.label} value={`${opt.min}-${opt.max}`} className="bg-card text-foreground">
+                    {opt.label}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+            </div>
           </div>
 
           <div>
@@ -164,24 +170,27 @@ export function JourneyStartCard() {
             >
               Community / Religion
             </label>
-            <select
-              id="religion"
-              value={preferences.religion}
-              onChange={(e) =>
-                setPreferences((prev) => ({
-                  ...prev,
-                  religion: e.target.value,
-                }))
-              }
-              className="w-full h-11 bg-background border border-input rounded-xl px-3.5 text-sm font-medium text-foreground outline-none focus:border-primary transition-colors cursor-pointer"
-            >
-              <option value="">Any Community</option>
-              {RELIGIONS_LIST.map((rel) => (
-                <option key={rel} value={rel}>
-                  {rel}
-                </option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                id="religion"
+                value={preferences.religion}
+                onChange={(e) =>
+                  setPreferences((prev) => ({
+                    ...prev,
+                    religion: e.target.value,
+                  }))
+                }
+                className="w-full h-11 appearance-none bg-card hover:bg-card/90 border border-border hover:border-primary/50 focus:border-primary rounded-xl px-4 pr-10 text-sm font-medium text-foreground outline-none transition-all cursor-pointer shadow-2xs"
+              >
+                <option value="" className="bg-card text-foreground">Any Community</option>
+                {RELIGIONS_LIST.map((rel) => (
+                  <option key={rel} value={rel} className="bg-card text-foreground">
+                    {rel}
+                  </option>
+                ))}
+              </select>
+              <ChevronDown className="absolute right-3.5 top-1/2 -translate-y-1/2 size-4 text-muted-foreground pointer-events-none" />
+            </div>
           </div>
         </div>
 
